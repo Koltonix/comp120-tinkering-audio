@@ -36,6 +36,8 @@ public class ToneGenerator : MonoBehaviour
 
         audioSource = this.GetComponent<AudioSource>();
         AudioClip newClip = CreateToneAudioClip(soundSettings, 1500);
+        newClip = IncreaseVolume(newClip, .1f);
+        audioSource.PlayOneShot(newClip);
     }
 
 
@@ -60,9 +62,7 @@ public class ToneGenerator : MonoBehaviour
         {
             float s = GetSinValue(frequency, i, soundSettings.sampleRate);
             float v = s * maxValue;
-            samples[i] = v;
-            
-
+            samples[i] = v;       
         }
 
         SpawnSampleSquare(samples, 200);
@@ -94,13 +94,58 @@ public class ToneGenerator : MonoBehaviour
     }
 
     /// <summary>
+    /// Uses a list of float samples that change the volume of the wave
+    /// </summary>
+    /// <param name="samples"></param>
+    /// <param name="amplitude"></param>
+    /// <returns>
+    /// A list of floats that represent the samples in an AudioClip
+    /// </returns>
+    private float[] IncreaseVolume(float[] samples, float amplitude)
+    {
+        for (int i = 0; i < samples.Length - 1; i++)
+        {
+            samples[i] *= amplitude;
+        }
+
+        return samples;
+    }
+
+    /// <summary>
+    /// Uses an audio clip to get the samples if the samples are not available elsewhere
+    /// </summary>
+    /// <param name="audioClip"></param>
+    /// <remarks>
+    /// https://docs.unity3d.com/ScriptReference/AudioClip.GetData.html
+    /// Documentation used to be able to access the data from the AudioClip
+    /// </remarks>
+    /// <returns>
+    /// An updated AudioClip with the changed volume
+    /// </returns>
+    private AudioClip IncreaseVolume(AudioClip audioClip, float amplitude)
+    {
+        float[] samples = new float[audioClip.samples * audioClip.channels];
+        audioClip.GetData(samples, 0);
+
+        for (int i = 0; i < samples.Length - 1; i++)
+        {
+            samples[i] = samples[i] * amplitude;
+        }
+
+        audioClip.SetData(samples, 0);
+        return audioClip;
+    }
+
+    /// <summary>
     ///  A sine function that produces a sine wave based on
     ///  a variety of variables
     /// </summary>
     /// <param name="frequency"></param>
     /// <param name="indexPosition"></param>
     /// <param name="sampleRate"></param>
-    /// <returns></returns>
+    /// <returns>
+    /// A float that represents a point on a wave
+    /// </returns>
     private float GetSinValue(float frequency, float indexPosition, float sampleRate)
     {
         return Mathf.Sin(2.0f * Mathf.PI * frequency * (indexPosition / sampleRate));
