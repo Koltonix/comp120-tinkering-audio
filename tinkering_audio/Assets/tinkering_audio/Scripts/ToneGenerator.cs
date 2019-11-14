@@ -36,7 +36,7 @@ public class ToneGenerator : MonoBehaviour
 
         audioSource = this.GetComponent<AudioSource>();
         AudioClip newClip = CreateToneAudioClip(soundSettings, 1500);
-        newClip = IncreaseVolume(newClip, .1f);
+        newClip = ChangeVolume(newClip, .5f);
         audioSource.PlayOneShot(newClip);
     }
 
@@ -66,7 +66,7 @@ public class ToneGenerator : MonoBehaviour
         }
 
         SpawnSampleSquare(samples, 200);
-
+        
         audioClip.SetData(samples, 0);
         return audioClip;
     }
@@ -101,7 +101,7 @@ public class ToneGenerator : MonoBehaviour
     /// <returns>
     /// A list of floats that represent the samples in an AudioClip
     /// </returns>
-    private float[] IncreaseVolume(float[] samples, float amplitude)
+    private float[] ChangeVolume(float[] samples, float amplitude)
     {
         for (int i = 0; i < samples.Length - 1; i++)
         {
@@ -122,7 +122,7 @@ public class ToneGenerator : MonoBehaviour
     /// <returns>
     /// An updated AudioClip with the changed volume
     /// </returns>
-    private AudioClip IncreaseVolume(AudioClip audioClip, float amplitude)
+    private AudioClip ChangeVolume(AudioClip audioClip, float amplitude)
     {
         float[] samples = new float[audioClip.samples * audioClip.channels];
         audioClip.GetData(samples, 0);
@@ -133,6 +133,44 @@ public class ToneGenerator : MonoBehaviour
         }
 
         audioClip.SetData(samples, 0);
+        return audioClip;
+    }
+
+    private float[] ChangeTempo(float[] samples, float tempoModifier)
+    {
+        float[] alteredSamples = new float[Mathf.FloorToInt(samples.Length * tempoModifier)];
+        
+        int samplesIndex = 0;
+        int alteredSamplesIndex = 0;
+        while (samplesIndex < alteredSamples.Length - 1)
+        {
+            if (samplesIndex < samples.Length - 1)
+            {
+                alteredSamples[alteredSamplesIndex] = samples[samplesIndex];
+            }
+            
+            if (alteredSamplesIndex % tempoModifier == 0)
+            {
+                samplesIndex++;
+            }
+
+            alteredSamplesIndex++;
+        }
+
+        return alteredSamples;
+    }
+
+    private AudioClip ChangeTempo(SoundSettings soundSettings, AudioClip audioClip, float tempoModifier)
+    {
+        float[] samples = new float[audioClip.samples * audioClip.channels];
+        float[] alteredSamples = new float[Mathf.FloorToInt(samples.Length * tempoModifier)];
+
+        for (int i = 0; i < alteredSamples.Length - 1; i++)
+        {
+            alteredSamples[i] = samples[Mathf.RoundToInt(tempoModifier / i)];
+        }
+
+        audioClip.SetData(alteredSamples, 0);
         return audioClip;
     }
 
