@@ -3,10 +3,10 @@
 
 ## [This Repository](https://github.com/Koltonix/comp120-tinkering-audio)
 
-|Name                 |Contract|
-|---------------------|--------|
-|Ludovico Bitti       | #1     |
-|Christopher Robertson| #4     |
+|Name                                                |Contract|
+|----------------------------------------------------|--------|
+|Ludovico Bitti                                      | #1     |
+|[Christopher Robertson](https://github.com/Koltonix)| #4     |
 
 ## Contract Information
 - Unity 2018.4.2f1
