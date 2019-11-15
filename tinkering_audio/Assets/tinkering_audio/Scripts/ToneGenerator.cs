@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public struct SoundSettings
+public class Sound
 {
+    public AudioClip audioClip;
+    public float[] samples;
+
     public int sampleRate;
     public int sampleDurationSecs;
     [HideInInspector]
     public int sampleLength;
+    
 }
 
 [RequireComponent(typeof(AudioSource))]
@@ -24,7 +28,9 @@ public class ToneGenerator : MonoBehaviour
 
     [Header("Wave Attributes")]
     [SerializeField]
-    private SoundSettings soundSettings;
+    private Sound generatedSound;
+    [SerializeField]
+    private Sound secondarySound;
     private AudioSource audioSource;
 
     public List<float> samplesList = new List<float>();
@@ -32,12 +38,20 @@ public class ToneGenerator : MonoBehaviour
 
     private void Start()
     {
-        soundSettings.sampleLength = soundSettings.sampleRate * soundSettings.sampleDurationSecs;
+        generatedSound.sampleLength = generatedSound.sampleRate * generatedSound.sampleDurationSecs;
 
         audioSource = this.GetComponent<AudioSource>();
-        AudioClip newClip = CreateToneAudioClip(soundSettings, 1500);
-        newClip = ChangeVolume(newClip, .5f);
-        audioSource.PlayOneShot(newClip);
+
+        Sound[] sounds = new Sound[2];
+        generatedSound.audioClip = CreateToneAudioClip(generatedSound, 1500);
+        secondarySound.audioClip = CreateToneAudioClip(secondarySound, 1500);
+
+        sounds[0] = generatedSound;
+        sounds[1] = secondarySound;
+
+        //Instance.AddAudioClips(sounds, 1500);
+        //generatedSound.audioClip = ToneModifiers.Instance.ChangeVolume(generatedSound.audioClip, .5f);
+        audioSource.PlayOneShot(generatedSound.audioClip);
     }
 
 
@@ -50,24 +64,23 @@ public class ToneGenerator : MonoBehaviour
     /// <returns>
     /// A Unity AudioClip data type
     /// </returns>
-    public AudioClip CreateToneAudioClip(SoundSettings soundSettings, int frequency)
+    public AudioClip CreateToneAudioClip(Sound soundSettings, int frequency)
     {
         soundSettings.sampleLength = soundSettings.sampleRate * soundSettings.sampleDurationSecs;
         float maxValue = 1f / 4f;
 
         AudioClip audioClip = AudioClip.Create("new_tone", soundSettings.sampleLength, 1, soundSettings.sampleRate, false);
 
-        float[] samples = new float[soundSettings.sampleLength];
+        soundSettings.samples = new float[soundSettings.sampleLength];
         for (var i = 0; i < soundSettings.sampleLength; i++)
         {
-            float s = GetSinValue(frequency, i, soundSettings.sampleRate);
+            float s = ToneWaves.Instance.GetSinValue(frequency, i, soundSettings.sampleRate);
             float v = s * maxValue;
-            samples[i] = v;       
+            soundSettings.samples[i] = v;
         }
 
-        SpawnSampleSquare(samples, 200);
-        
-        audioClip.SetData(samples, 0);
+        SpawnSampleSquare(soundSettings.samples, 200);
+        audioClip.SetData(soundSettings.samples, 0);
         return audioClip;
     }
 
@@ -93,99 +106,5 @@ public class ToneGenerator : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Uses a list of float samples that change the volume of the wave
-    /// </summary>
-    /// <param name="samples"></param>
-    /// <param name="amplitude"></param>
-    /// <returns>
-    /// A list of floats that represent the samples in an AudioClip
-    /// </returns>
-    private float[] ChangeVolume(float[] samples, float amplitude)
-    {
-        for (int i = 0; i < samples.Length - 1; i++)
-        {
-            samples[i] *= amplitude;
-        }
-
-        return samples;
-    }
-
-    /// <summary>
-    /// Uses an audio clip to get the samples if the samples are not available elsewhere
-    /// </summary>
-    /// <param name="audioClip"></param>
-    /// <remarks>
-    /// https://docs.unity3d.com/ScriptReference/AudioClip.GetData.html
-    /// Documentation used to be able to access the data from the AudioClip
-    /// </remarks>
-    /// <returns>
-    /// An updated AudioClip with the changed volume
-    /// </returns>
-    private AudioClip ChangeVolume(AudioClip audioClip, float amplitude)
-    {
-        float[] samples = new float[audioClip.samples * audioClip.channels];
-        audioClip.GetData(samples, 0);
-
-        for (int i = 0; i < samples.Length - 1; i++)
-        {
-            samples[i] = samples[i] * amplitude;
-        }
-
-        audioClip.SetData(samples, 0);
-        return audioClip;
-    }
-
-    private float[] ChangeTempo(float[] samples, float tempoModifier)
-    {
-        float[] alteredSamples = new float[Mathf.FloorToInt(samples.Length * tempoModifier)];
-        
-        int samplesIndex = 0;
-        int alteredSamplesIndex = 0;
-        while (samplesIndex < alteredSamples.Length - 1)
-        {
-            if (samplesIndex < samples.Length - 1)
-            {
-                alteredSamples[alteredSamplesIndex] = samples[samplesIndex];
-            }
-            
-            if (alteredSamplesIndex % tempoModifier == 0)
-            {
-                samplesIndex++;
-            }
-
-            alteredSamplesIndex++;
-        }
-
-        return alteredSamples;
-    }
-
-    private AudioClip ChangeTempo(SoundSettings soundSettings, AudioClip audioClip, float tempoModifier)
-    {
-        float[] samples = new float[audioClip.samples * audioClip.channels];
-        float[] alteredSamples = new float[Mathf.FloorToInt(samples.Length * tempoModifier)];
-
-        for (int i = 0; i < alteredSamples.Length - 1; i++)
-        {
-            alteredSamples[i] = samples[Mathf.RoundToInt(tempoModifier / i)];
-        }
-
-        audioClip.SetData(alteredSamples, 0);
-        return audioClip;
-    }
-
-    /// <summary>
-    ///  A sine function that produces a sine wave based on
-    ///  a variety of variables
-    /// </summary>
-    /// <param name="frequency"></param>
-    /// <param name="indexPosition"></param>
-    /// <param name="sampleRate"></param>
-    /// <returns>
-    /// A float that represents a point on a wave
-    /// </returns>
-    private float GetSinValue(float frequency, float indexPosition, float sampleRate)
-    {
-        return Mathf.Sin(2.0f * Mathf.PI * frequency * (indexPosition / sampleRate));
-    }
+    
 }

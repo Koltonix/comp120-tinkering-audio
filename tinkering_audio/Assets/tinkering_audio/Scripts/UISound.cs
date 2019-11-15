@@ -3,7 +3,7 @@
 public class UISound : MonoBehaviour
 {
     [SerializeField]
-    private SoundSettings soundSettings;
+    private Sound soundSettings;
     private AudioSource audioSource;
 
     private void Start()
