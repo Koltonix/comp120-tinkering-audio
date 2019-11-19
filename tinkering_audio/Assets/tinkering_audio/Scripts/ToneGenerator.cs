@@ -54,8 +54,10 @@ public class ToneGenerator : MonoBehaviour
         ToneModifiers.Instance.IncreasePitch(generatedSound, 2);
         RefactorSamplesInClip(generatedSound);
         SpawnSampleSquare(generatedSound.samples, 200);
-        generatedSound.audioClip = ToneModifiers.Instance.ChangeVolume(generatedSound.audioClip, .01f);
-        audioSource.PlayOneShot(generatedSound.audioClip);
+        generatedSound.audioClip = ToneModifiers.Instance.ChangeVolume(generatedSound.audioClip, 1f);
+
+        Sound combinedSounds = ToneModifiers.Instance.MultiplyAudioClips(sounds);
+        audioSource.PlayOneShot(combinedSounds.audioClip);
     }
 
 

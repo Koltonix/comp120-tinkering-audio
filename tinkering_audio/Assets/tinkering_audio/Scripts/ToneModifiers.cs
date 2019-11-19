@@ -58,27 +58,49 @@ public class ToneModifiers : MonoBehaviour
 
     #endregion
 
-    //TODO
-    #region Adding Audio
-    public AudioClip AddAudioClips(Sound[] sounds, int frequency)
+    #region Multiplying Audio
+    public Sound MultiplyAudioClips(Sound[] sounds)
     {
-        List<float> samples = new List<float>();
-        int sampleLength = 0;
-        
-        for (int i = 0; i < sounds.Length - 1; i++)
-        {
-            sampleLength += (sounds[i].sampleRate * sounds[i].sampleDurationSecs);
-
-            for (int j = 0; j < sounds[i].sampleLength - 1; j++)
+        Sound combinedSoundSettings = new Sound();
+        GetLargestSoundValues(combinedSoundSettings, sounds);
+        combinedSoundSettings.samples = new float[50000];
+        for (int i = 0; i < sounds.Length; i++)
+        {        
+            for (int j = 0; j < sounds[i].samples.Length - 1; j++)
             {
-                samples.Add(sounds[i].samples[j]);
+                combinedSoundSettings.samples[i] += sounds[i].samples[j];
             }
         }
 
-        AudioClip audioClip = AudioClip.Create("new_tone", sampleLength, 1, sounds[0].sampleRate, false);
-        audioClip.SetData(samples.ToArray(), 0);
+        combinedSoundSettings.audioClip = ToneGenerator.Instance.CreateToneAudioClip(combinedSoundSettings);
+        return combinedSoundSettings;
+    }
 
-        return audioClip;
+    private void GetLargestSoundValues(Sound soundSettings, Sound[] sounds)
+    {
+        for (int i = 0; i < sounds.Length; i++)
+        {
+            if (soundSettings.frequency < sounds[i].frequency)
+            {
+                soundSettings.frequency = sounds[i].frequency;
+            }
+
+            //Currently not working and providees a null exception error
+            //if (soundSettings.samples.Length < sounds[i].samples.Length)
+            //{
+            //    soundSettings.samples = new float[sounds[i].samples.Length];
+            //}
+
+            if (soundSettings.sampleRate < sounds[i].sampleRate)
+            {
+                soundSettings.sampleRate = sounds[i].sampleRate;
+            }
+
+            if (soundSettings.sampleDurationSecs < sounds[i].samples.Length)
+            {
+                soundSettings.sampleDurationSecs = sounds[i].sampleDurationSecs;
+            }
+        }
     }
 
     #endregion

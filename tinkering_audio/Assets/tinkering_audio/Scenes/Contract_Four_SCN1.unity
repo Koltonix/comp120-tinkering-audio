@@ -1337,10 +1337,10 @@ MonoBehaviour:
     sampleLength: 0
   secondarySound:
     audioClip: {fileID: 0}
-    frequency: 0
+    frequency: 1500
     samples: []
     sampleRate: 44100
-    sampleDurationSecs: 5
+    sampleDurationSecs: 2
     sampleLength: 0
   samplesList: []
   squarePrefab: {fileID: 4582863248361522357, guid: ddaacda13042e5d4cbd326b103201e01,
