@@ -115,6 +115,8 @@ public class ToneModifiers : MonoBehaviour
 
             alteredSamplesIndex++;
         }
+
+        soundSettings.samples = alteredSamples;
     }
     #endregion
 }
