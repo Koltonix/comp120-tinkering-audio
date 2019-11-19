@@ -29,4 +29,39 @@ public class ToneWaves : MonoBehaviour
         return Mathf.Sin(2.0f * Mathf.PI * frequency * (indexPosition / sampleRate));
     }
     #endregion
+
+    #region Square Wave
+    public float GetSquareSinValue(float frequency, float indexPosition, float sampleRate)
+    {
+        if (Mathf.Sin(2.0f * Mathf.PI * frequency * (indexPosition / sampleRate)) > 0)
+        {
+            return 1;
+        }
+
+        else
+        {
+            return -1;
+        }
+    }
+
+    public float[] ConvertWaveToSquareWave(Sound soundSettings)
+    {
+        for (int i = 0; i < soundSettings.samples.Length - 1; i++)
+        {
+            if (soundSettings.samples[i] > 0)
+            {
+                soundSettings.samples[i] = 1;
+            }
+
+            else
+            {
+                soundSettings.samples[i] = -1;
+            }
+        }
+
+        return soundSettings.samples;
+    }
+
+
+    #endregion
 }

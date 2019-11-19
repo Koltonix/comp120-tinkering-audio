@@ -6,8 +6,9 @@ using UnityEngine;
 public class Sound
 {
     public AudioClip audioClip;
-    public float[] samples;
+    public float frequency;
 
+    public float[] samples;
     public int sampleRate;
     public int sampleDurationSecs;
     [HideInInspector]
@@ -43,14 +44,17 @@ public class ToneGenerator : MonoBehaviour
         audioSource = this.GetComponent<AudioSource>();
 
         Sound[] sounds = new Sound[2];
-        generatedSound.audioClip = CreateToneAudioClip(generatedSound, 1500);
-        secondarySound.audioClip = CreateToneAudioClip(secondarySound, 1500);
+        generatedSound.audioClip = CreateToneAudioClip(generatedSound);
+        secondarySound.audioClip = CreateToneAudioClip(secondarySound);
 
         sounds[0] = generatedSound;
         sounds[1] = secondarySound;
 
         //Instance.AddAudioClips(sounds, 1500);
-        //generatedSound.audioClip = ToneModifiers.Instance.ChangeVolume(generatedSound.audioClip, .5f);
+        ToneWaves.Instance.ConvertWaveToSquareWave(generatedSound);
+        RefactorSamplesInClip(generatedSound);
+        SpawnSampleSquare(generatedSound.samples, 200);
+        generatedSound.audioClip = ToneModifiers.Instance.ChangeVolume(generatedSound.audioClip, .01f);
         audioSource.PlayOneShot(generatedSound.audioClip);
     }
 
@@ -64,7 +68,7 @@ public class ToneGenerator : MonoBehaviour
     /// <returns>
     /// A Unity AudioClip data type
     /// </returns>
-    public AudioClip CreateToneAudioClip(Sound soundSettings, int frequency)
+    public AudioClip CreateToneAudioClip(Sound soundSettings)
     {
         soundSettings.sampleLength = soundSettings.sampleRate * soundSettings.sampleDurationSecs;
         float maxValue = 1f / 4f;
@@ -74,14 +78,18 @@ public class ToneGenerator : MonoBehaviour
         soundSettings.samples = new float[soundSettings.sampleLength];
         for (var i = 0; i < soundSettings.sampleLength; i++)
         {
-            float s = ToneWaves.Instance.GetSinValue(frequency, i, soundSettings.sampleRate);
+            float s = ToneWaves.Instance.GetSinValue(soundSettings.frequency, i, soundSettings.sampleRate);
             float v = s * maxValue;
             soundSettings.samples[i] = v;
         }
 
-        SpawnSampleSquare(soundSettings.samples, 200);
         audioClip.SetData(soundSettings.samples, 0);
         return audioClip;
+    }
+
+    public void RefactorSamplesInClip(Sound soundSettings)
+    {
+        soundSettings.audioClip.SetData(soundSettings.samples, 0);
     }
 
     /// <summary>

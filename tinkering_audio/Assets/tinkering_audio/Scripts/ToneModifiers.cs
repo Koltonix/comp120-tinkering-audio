@@ -58,6 +58,7 @@ public class ToneModifiers : MonoBehaviour
 
     #endregion
 
+    //TODO
     #region Adding Audio
     public AudioClip AddAudioClips(Sound[] sounds, int frequency)
     {
@@ -108,7 +109,7 @@ public class ToneModifiers : MonoBehaviour
         return alteredSamples;
     }
 
-    public AudioClip ChangeTempo(Sound soundSettings, AudioClip audioClip, float tempoModifier)
+    public AudioClip ChangeFrequency(Sound soundSettings, AudioClip audioClip, float tempoModifier)
     {
         float[] samples = new float[audioClip.samples * audioClip.channels];
         float[] alteredSamples = new float[Mathf.FloorToInt(samples.Length * tempoModifier)];

@@ -890,6 +890,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundSettings:
     audioClip: {fileID: 0}
+    frequency: 0
     samples: []
     sampleRate: 44100
     sampleDurationSecs: 5
@@ -1329,12 +1330,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   generatedSound:
     audioClip: {fileID: 0}
+    frequency: 1500
     samples: []
     sampleRate: 44100
     sampleDurationSecs: 2
     sampleLength: 0
   secondarySound:
     audioClip: {fileID: 0}
+    frequency: 0
     samples: []
     sampleRate: 44100
     sampleDurationSecs: 5
