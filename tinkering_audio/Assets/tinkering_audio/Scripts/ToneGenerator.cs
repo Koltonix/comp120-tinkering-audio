@@ -49,16 +49,17 @@ public class ToneGenerator : MonoBehaviour
 
         sounds[0] = generatedSound;
         sounds[1] = secondarySound;
-
-        //Instance.AddAudioClips(sounds, 1500);
-        ToneWaves.Instance.ConvertWaveToSquareWave(generatedSound);
+       
+        //ToneWaves.Instance.ConvertWaveToSquareWave(generatedSound);
+        ToneModifiers.Instance.IncreasePitch(generatedSound, 2);
         RefactorSamplesInClip(generatedSound);
         SpawnSampleSquare(generatedSound.samples, 200);
-        generatedSound.audioClip = ToneModifiers.Instance.ChangeVolume(generatedSound.audioClip, .01f);
+        generatedSound.audioClip = ToneModifiers.Instance.ChangeVolume(generatedSound.audioClip, .1f);
         audioSource.PlayOneShot(generatedSound.audioClip);
     }
 
 
+    #region Generating Audioclip
     /// <summary>
     /// A function that uses a variety of sound settings and 
     /// the frequency to generate a clip of sound
@@ -76,7 +77,7 @@ public class ToneGenerator : MonoBehaviour
         AudioClip audioClip = AudioClip.Create("new_tone", soundSettings.sampleLength, 1, soundSettings.sampleRate, false);
 
         soundSettings.samples = new float[soundSettings.sampleLength];
-        for (var i = 0; i < soundSettings.sampleLength; i++)
+        for (int i = 0; i < soundSettings.sampleLength; i++)
         {
             float s = ToneWaves.Instance.GetSinValue(soundSettings.frequency, i, soundSettings.sampleRate);
             float v = s * maxValue;
@@ -87,11 +88,29 @@ public class ToneGenerator : MonoBehaviour
         return audioClip;
     }
 
+    #endregion
+
+    #region Refactor Samples
+    /// <summary>
+    /// Uses the AudioClp in 
+    /// </summary>
+    /// <param name="soundSettings"></param>
     public void RefactorSamplesInClip(Sound soundSettings)
     {
-        soundSettings.audioClip.SetData(soundSettings.samples, 0);
-    }
+        if (soundSettings.audioClip != null)
+        {
+            soundSettings.audioClip.SetData(soundSettings.samples, 0);
+        }
 
+        else
+        {
+            throw new Exception("No audioclip is present to alter the samples of...");
+        }
+        
+    }
+    #endregion
+
+    #region Debug Functions
     /// <summary>
     /// Uses the samples from the audioclip to generate a visual intepretation of the wave using squares.
     /// </summary>
@@ -113,6 +132,6 @@ public class ToneGenerator : MonoBehaviour
             Instantiate(squarePrefab, spawnPosition, Quaternion.identity);
         }
     }
+    #endregion
 
-    
 }

@@ -83,19 +83,29 @@ public class ToneModifiers : MonoBehaviour
 
     #endregion
 
-    //Temo might be out of scope for now
-    #region Tempo
-    public float[] ChangeTempo(float[] samples, float tempoModifier)
+    #region Pitch
+    /// <summary>
+    /// Increases the pitch of an audioclip where it uses a modifier
+    /// to duplicate each element a certain amount of times
+    /// </summary>
+    /// <param name="soundSettings"></param>
+    /// <param name="tempoModifier"></param>
+    /// <remarks>
+    /// This will only increase, decreasing will be a separate function.
+    /// Note that this will currently keep the maximum amount of samples
+    /// and will therefore remove any extras on the end that do not fit
+    /// </remarks>
+    public void IncreasePitch(Sound soundSettings, int tempoModifier)
     {
-        float[] alteredSamples = new float[Mathf.FloorToInt(samples.Length * tempoModifier)];
+        float[] alteredSamples = new float[Mathf.FloorToInt(soundSettings.samples.Length * tempoModifier)];
 
         int samplesIndex = 0;
         int alteredSamplesIndex = 0;
         while (samplesIndex < alteredSamples.Length - 1)
         {
-            if (samplesIndex < samples.Length - 1)
+            if (samplesIndex < soundSettings.samples.Length - 1)
             {
-                alteredSamples[alteredSamplesIndex] = samples[samplesIndex];
+                alteredSamples[alteredSamplesIndex] = soundSettings.samples[samplesIndex];
             }
 
             if (alteredSamplesIndex % tempoModifier == 0)
@@ -105,23 +115,6 @@ public class ToneModifiers : MonoBehaviour
 
             alteredSamplesIndex++;
         }
-
-        return alteredSamples;
     }
-
-    public AudioClip ChangeFrequency(Sound soundSettings, AudioClip audioClip, float tempoModifier)
-    {
-        float[] samples = new float[audioClip.samples * audioClip.channels];
-        float[] alteredSamples = new float[Mathf.FloorToInt(samples.Length * tempoModifier)];
-
-        for (int i = 0; i < alteredSamples.Length - 1; i++)
-        {
-            alteredSamples[i] = samples[Mathf.RoundToInt(tempoModifier / i)];
-        }
-
-        audioClip.SetData(alteredSamples, 0);
-        return audioClip;
-    }
-
     #endregion
 }

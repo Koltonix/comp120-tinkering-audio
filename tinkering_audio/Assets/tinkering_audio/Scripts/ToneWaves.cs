@@ -24,14 +24,25 @@ public class ToneWaves : MonoBehaviour
     /// <returns>
     /// A float that represents a point on a wave
     /// </returns>
-    public float GetSinValue(float frequency, float indexPosition, float sampleRate)
+    public float GetSinValue(float frequency, int indexPosition, float sampleRate)
     {
         return Mathf.Sin(2.0f * Mathf.PI * frequency * (indexPosition / sampleRate));
     }
     #endregion
 
     #region Square Wave
-    public float GetSquareSinValue(float frequency, float indexPosition, float sampleRate)
+    /// <summary>
+    /// Produces a square wave which provides a more unique
+    /// sound to that of say a sine wave
+    /// </summary>
+    /// <param name="frequency"></param>
+    /// <param name="indexPosition"></param>
+    /// <param name="sampleRate"></param>
+    /// <returns>
+    /// Returns a float which is either a 1
+    /// or a -1 which creates the square sound
+    /// </returns>
+    public float GetSquareSinValue(float frequency, int indexPosition, float sampleRate)
     {
         if (Mathf.Sin(2.0f * Mathf.PI * frequency * (indexPosition / sampleRate)) > 0)
         {
@@ -44,6 +55,19 @@ public class ToneWaves : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Converts any audioclip samples provided to become a square wave
+    /// with samples either being 1 or -1
+    /// </summary>
+    /// <param name="soundSettings"></param>
+    /// <remarks>
+    /// Not to be confused with GetSquareSinValue(...) which instead provides
+    /// the value directly rather than going through the entire list
+    /// </remarks>
+    /// <returns>
+    /// Returns a list of floats to replace the samples that were 
+    /// just adjusted
+    /// </returns>
     public float[] ConvertWaveToSquareWave(Sound soundSettings)
     {
         for (int i = 0; i < soundSettings.samples.Length - 1; i++)
