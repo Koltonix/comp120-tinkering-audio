@@ -60,7 +60,7 @@ public class AudioTinker : MonoBehaviour
 
         //float output = (4 * Mathf.Sin(30)) / (3 * Mathf.PI);
 
-        //if (output < 0) { return -1; } else { return 1; }
+        if (output < 0) { return -1; } else { return 1; }
 
         return output;
 
@@ -93,7 +93,7 @@ public class AudioTinker : MonoBehaviour
             BigNumber = Mathf.Max(BigNumber, number);
 
         }
-        SaveWavUtil.Save("C:\\Users\\Ludovico Bitti\\Desktop\\UNI\\Comp120 (programming)\\2. TA\\Git\\ACM-COMP120-Tinker-Audio-Template\\Sound" + (BigNumber + AddNumber) + ".wav", audioClip);
+        SaveWavUtil.Save("C:\\Users\\Ludovico Bitti\\Desktop\\Sound" + (BigNumber + AddNumber) + ".wav", audioClip);
     }
 
 }
