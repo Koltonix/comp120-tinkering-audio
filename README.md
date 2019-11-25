@@ -31,3 +31,4 @@ of settings should be made available and configurable by a designer*
 ## Instructions
 
 # MIT License
+We have decided to go with the MIT License since we are more than pleased for people to use our code in a commercial sense for their own software. We also acknowledge and allow the distribution and modification of our code to be used elsewhere whether it be public, or private. The conditions to this is that this piece of code provides no warranty, nor limitation of liability. The largest condition is that if our code is used then the MIT License provided must be included in said project and state our authorship into it. The reason we quite like this is because it could potentially help the open source community for free while still allowing us to retain our authorship of the code which could be to our benefit in gaining some advertisement in the software development industry.
