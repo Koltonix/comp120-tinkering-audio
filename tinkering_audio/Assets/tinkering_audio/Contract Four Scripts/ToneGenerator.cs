@@ -62,6 +62,9 @@ public class ToneGenerator : MonoBehaviour
     /// </summary>
     /// <param name="soundSettings"></param>
     /// <param name="frequency"></param>
+    /// <remarks>
+    /// Sourced from https://github.com/yaustar/ACM-COMP120-Tinker-Audio-Template/blob/master/Assets/Game/Scripts/AudioTinker.cs
+    /// </remarks>
     /// <returns>
     /// A Unity AudioClip data type
     /// </returns>
