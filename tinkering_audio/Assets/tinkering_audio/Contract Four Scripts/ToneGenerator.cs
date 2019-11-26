@@ -44,30 +44,6 @@ public class ToneGenerator : MonoBehaviour
     public List<float> samplesList = new List<float>();
     public GameObject squarePrefab;
 
-    private void Start()
-    {
-        //generatedSound.sampleLength = Mathf.RoundToInt(generatedSound.sampleRate * generatedSound.sampleDurationSecs);
-
-        //audioSource = this.GetComponent<AudioSource>();
-
-        //Sound[] sounds = new Sound[2];
-        //generatedSound.audioClip = CreateToneAudioClip(generatedSound);
-        //secondarySound.audioClip = CreateToneAudioClip(secondarySound);
-
-        //sounds[0] = generatedSound;
-        //sounds[1] = secondarySound;
-
-        //ToneWaves.Instance.ConvertWaveToSquareWave(generatedSound);
-        //ToneModifiers.Instance.IncreasePitch(generatedSound, 2);
-        //RefactorSamplesInClip(generatedSound);
-        //SpawnSampleSquare(generatedSound.samples, 200);
-        //generatedSound.audioClip = ToneModifiers.Instance.ChangeVolume(generatedSound.audioClip, 1f);
-
-        //Sound combinedSounds = ToneModifiers.Instance.MultiplyAudioClips(sounds);
-        //audioSource.PlayOneShot(combinedSounds.audioClip);
-    }
-
-
     #region Generating Audioclip
     /// <summary>
     /// A function that uses a variety of sound settings and 
@@ -80,6 +56,11 @@ public class ToneGenerator : MonoBehaviour
     /// </returns>
     public AudioClip CreateToneAudioClip(Sound soundSettings)
     {
+        if (soundSettings.sampleDurationSecs <= 0)
+        {
+            throw new Exception("Audioclip must be longer than 0 seconds");
+        }
+
         soundSettings.sampleLength = Mathf.RoundToInt(soundSettings.sampleRate * soundSettings.sampleDurationSecs);
         float maxValue = 1f / 4f;
 

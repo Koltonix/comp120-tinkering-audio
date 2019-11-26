@@ -50,7 +50,13 @@ public class UISound : MonoBehaviour
         currentSoundSettings.audioClip = ToneGenerator.Instance.CreateToneAudioClip(currentSoundSettings);
         ChangeAudioClipWave();
         currentSoundSettings.audioClip = ToneModifiers.Instance.ChangeVolume(currentSoundSettings.audioClip, clipVolume);
+    }
 
+    public void SaveAudioClip()
+    {
+        GenerateSoundClip();
+        SaveWavUtil.Save("new_audio_clip", currentSoundSettings.audioClip);
+        print(Application.dataPath + "/Generated Clips");
     }
 
     private void ChangeAudioClipWave()

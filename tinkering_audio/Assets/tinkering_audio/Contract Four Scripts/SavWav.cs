@@ -52,7 +52,7 @@ public static class SaveWavUtil
             filename += ".wav";
         }
 
-        var filepath = Path.Combine(Application.persistentDataPath, filename);
+        var filepath = Path.Combine(Application.dataPath + "/Generated Clips", filename);
 
         // Make sure directory exists if user is saving to sub dir.
         Directory.CreateDirectory(Path.GetDirectoryName(filepath));

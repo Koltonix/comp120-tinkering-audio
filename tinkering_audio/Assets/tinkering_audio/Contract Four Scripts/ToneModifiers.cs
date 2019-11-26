@@ -58,6 +58,7 @@ public class ToneModifiers : MonoBehaviour
 
     #endregion
 
+    //Not currently working
     #region Multiplying Audio
     public Sound MultiplyAudioClips(Sound[] sounds)
     {
@@ -85,7 +86,7 @@ public class ToneModifiers : MonoBehaviour
                 soundSettings.frequency = sounds[i].frequency;
             }
 
-            //Currently not working and providees a null exception error
+            //Currently not working and provides a null exception error
             //if (soundSettings.samples.Length < sounds[i].samples.Length)
             //{
             //    soundSettings.samples = new float[sounds[i].samples.Length];
