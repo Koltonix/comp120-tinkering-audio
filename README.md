@@ -5,7 +5,7 @@
 
 |Name                                                |Contract|
 |----------------------------------------------------|--------|
-|Ludovico Bitti                                      | #1     |
+|[Ludovico Bitti](https://github.com/Ludovico98)     | #1     |
 |[Christopher Robertson](https://github.com/Koltonix)| #4     |
 
 ## Contract Information
