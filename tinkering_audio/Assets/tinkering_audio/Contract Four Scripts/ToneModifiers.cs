@@ -68,50 +68,35 @@ public class ToneModifiers : MonoBehaviour
 
     #endregion
 
-    //Not currently working
     #region Multiplying Audio
     public Sound MultiplyAudioClips(Sound[] sounds)
     {
-        Sound combinedSoundSettings = new Sound();
-        GetLargestSoundValues(combinedSoundSettings, sounds);
-        combinedSoundSettings.samples = new float[50000];
-        for (int i = 0; i < sounds.Length; i++)
-        {        
-            for (int j = 0; j < sounds[i].samples.Length - 1; j++)
-            {
-                combinedSoundSettings.samples[i] += sounds[i].samples[j];
-            }
-        }
-
+        Sound combinedSoundSettings = GetLargestSoundValues(sounds);
         combinedSoundSettings.audioClip = ToneGenerator.Instance.CreateToneAudioClip(combinedSoundSettings);
         return combinedSoundSettings;
     }
 
-    private void GetLargestSoundValues(Sound soundSettings, Sound[] sounds)
+    private Sound GetLargestSoundValues(Sound[] soundSettings)
     {
-        for (int i = 0; i < sounds.Length; i++)
+        Sound newSettings = new Sound();
+        newSettings.waveType = WaveType.Dynamic;
+
+        foreach(Sound setting in soundSettings)
         {
-            if (soundSettings.frequency < sounds[i].frequency)
+            if (setting.frequency > newSettings.frequency) newSettings.frequency = setting.frequency;
+
+            if (setting.sampleLength > newSettings.sampleLength)
             {
-                soundSettings.frequency = sounds[i].frequency;
+                newSettings.sampleLength = setting.sampleLength;
+                newSettings.samples = new float[newSettings.sampleLength];
             }
 
-            //Currently not working and provides a null exception error
-            //if (soundSettings.samples.Length < sounds[i].samples.Length)
-            //{
-            //    soundSettings.samples = new float[sounds[i].samples.Length];
-            //}
+            if (setting.sampleRate > newSettings.sampleRate) newSettings.sampleRate = setting.sampleRate; 
 
-            if (soundSettings.sampleRate < sounds[i].sampleRate)
-            {
-                soundSettings.sampleRate = sounds[i].sampleRate;
-            }
-
-            if (soundSettings.sampleDurationSecs < sounds[i].samples.Length)
-            {
-                soundSettings.sampleDurationSecs = sounds[i].sampleDurationSecs;
-            }
+            if (setting.sampleDurationSecs > newSettings.sampleDurationSecs) newSettings.sampleDurationSecs = setting.sampleDurationSecs;
         }
+
+        return newSettings;
     }
 
     #endregion

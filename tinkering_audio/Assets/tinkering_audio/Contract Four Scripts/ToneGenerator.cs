@@ -16,7 +16,8 @@ using UnityEngine;
 public enum WaveType
 {
     Sine = 0,
-    Square = 1
+    Square = 1,
+    Dynamic
 };
 
 [Serializable]
@@ -50,10 +51,24 @@ public class ToneGenerator : MonoBehaviour
     private Sound generatedSound;
     [SerializeField]
     private Sound secondarySound;
+    [SerializeField]
+    private Sound placeHolder;
     private AudioSource audioSource;
 
     public List<float> samplesList = new List<float>();
     public GameObject squarePrefab;
+
+    private void Start()
+    {
+        generatedSound.audioClip = CreateToneAudioClip(generatedSound);
+        secondarySound.audioClip = CreateToneAudioClip(secondarySound);
+
+        generatedSound.audioClip = ToneWaves.Instance.ConvertClipToSquareWave(generatedSound);
+
+        Sound[] combinedSettings = new Sound[2];
+        combinedSettings[0] = generatedSound;
+        combinedSettings[1] = secondarySound;
+    }
 
     #region Generating Audioclip
     /// <summary>
@@ -91,7 +106,7 @@ public class ToneGenerator : MonoBehaviour
         audioClip.SetData(soundSettings.samples, 0);
         return audioClip;
     }
-
+ 
     #endregion
 
     #region Refactor Samples
