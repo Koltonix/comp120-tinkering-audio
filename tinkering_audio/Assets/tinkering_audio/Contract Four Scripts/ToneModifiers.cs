@@ -1,5 +1,15 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
+//-----------------------------------------------------------------------
+// <copyright file="ToneModifiers.cs">
+// MIT License Copyright (c) 2019.
+// </copyright>
+// <author>Christopher Philip Robertson</author>
+// <summary>
+// Handles the modificatino of the samples and sound clips to provide a new
+// and unique sound.
+// </summary>
+//----
 
 public class ToneModifiers : MonoBehaviour
 {

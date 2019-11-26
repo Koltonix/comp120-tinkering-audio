@@ -2,6 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//-----------------------------------------------------------------------
+// <copyright file="ToneWaves.cs">
+// MIT License Copyright (c) 2019.
+// </copyright>
+// <author>Christopher Philip Robertson</author>
+// <summary>
+// Handles the creation of different types of waves as well as altering
+// current waves.
+// </summary>
+//----
+
 public class ToneWaves : MonoBehaviour
 {
     #region Singleton Instance

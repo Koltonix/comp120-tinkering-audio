@@ -2,6 +2,16 @@
 using UnityEngine.UI;
 using TMPro;
 
+//-----------------------------------------------------------------------
+// <copyright file="UISound.cs">
+// MIT License Copyright (c) 2019.
+// </copyright>
+// <author>Christopher Philip Robertson</author>
+// <summary>
+// Handles the UI behaviour and input of the user to generate sounds
+// </summary>
+//----
+
 public class UISound : MonoBehaviour
 {
     [SerializeField]

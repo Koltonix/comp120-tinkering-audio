@@ -2,6 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//-----------------------------------------------------------------------
+// <copyright file="ToneGenerator.cs">
+// MIT License Copyright (c) 2019.
+// </copyright>
+// <author>Christopher Philip Robertson</author>
+// <summary>
+// Handles the sound clip generation and the respective methods associated
+// with updating the sound and some primitive debugging tools for it too.
+// </summary>
+//----
+
 public enum WaveType
 {
     Sine = 0,
