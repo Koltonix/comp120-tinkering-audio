@@ -130,4 +130,9 @@ public class ToneWaves : MonoBehaviour
 
 
     #endregion
+
+    #region Triangle Wave
+    //https://www.fxsolver.com/browse/formulas/Sawtooth+wave
+    //https://www.fxsolver.com/browse/formulas/Triangle+wave+%28in+trigonometric+terms%29
+    #endregion
 }

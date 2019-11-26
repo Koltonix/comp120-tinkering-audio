@@ -70,6 +70,19 @@ public class ToneModifiers : MonoBehaviour
     #endregion
 
     #region Multiplying Audio
+    /// <summary>
+    /// Uses the samples from a variety of audioclips to produce a combination
+    /// of all of the sounds
+    /// </summary>
+    /// <param name="sounds"></param>
+    /// <remarks>
+    /// This can be later used in an echo sort of method where I call this in
+    /// conjunction with a clip slicer
+    /// </remarks>
+    /// <returns>
+    /// Returns a new instance of the Sound class with all of the associated
+    /// varibles assigned to it
+    /// </returns>
     public Sound MultiplyAudioClips(Sound[] sounds)
     {
         List<float> addedSamples = new List<float>();
@@ -105,6 +118,16 @@ public class ToneModifiers : MonoBehaviour
         return combinedSettings;
     }
 
+
+    /// <summary>
+    /// Used to compared all of the sample rates of the sounds to combine
+    /// and chooses the largest to be used on the new sound.
+    /// </summary>
+    /// <param name="sounds"></param>
+    /// <returns>
+    /// Return an integer that is the largest sample rate out of all of the
+    /// sounds compared with
+    /// </returns>
     private int GetLargestSampleRate(Sound[] sounds)
     {
         int largestSampleRate= 0;
