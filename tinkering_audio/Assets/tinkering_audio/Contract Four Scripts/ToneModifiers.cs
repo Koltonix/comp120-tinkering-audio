@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 //-----------------------------------------------------------------------
 // <copyright file="ToneModifiers.cs">
@@ -71,32 +72,51 @@ public class ToneModifiers : MonoBehaviour
     #region Multiplying Audio
     public Sound MultiplyAudioClips(Sound[] sounds)
     {
-        Sound combinedSoundSettings = GetLargestSoundValues(sounds);
-        combinedSoundSettings.audioClip = ToneGenerator.Instance.CreateToneAudioClip(combinedSoundSettings);
-        return combinedSoundSettings;
-    }
+        List<float> addedSamples = new List<float>();
+        Sound combinedSettings = new Sound();
+        combinedSettings.waveType = WaveType.Dynamic;
 
-    private Sound GetLargestSoundValues(Sound[] soundSettings)
-    {
-        Sound newSettings = new Sound();
-        newSettings.waveType = WaveType.Dynamic;
-
-        foreach(Sound setting in soundSettings)
+        for (int i = 0; i < sounds.Length; i++)
         {
-            if (setting.frequency > newSettings.frequency) newSettings.frequency = setting.frequency;
+            combinedSettings.frequency += sounds[i].frequency;
 
-            if (setting.sampleLength > newSettings.sampleLength)
+            for (int j = 0; j < sounds[i].samples.Length; j++)
             {
-                newSettings.sampleLength = setting.sampleLength;
-                newSettings.samples = new float[newSettings.sampleLength];
+                if (addedSamples.Count - 1 < j)
+                {
+                    addedSamples.Add(sounds[i].samples[j]);
+                }
+
+                else
+                {
+                    addedSamples[j] += sounds[i].samples[j];
+                }
             }
-
-            if (setting.sampleRate > newSettings.sampleRate) newSettings.sampleRate = setting.sampleRate; 
-
-            if (setting.sampleDurationSecs > newSettings.sampleDurationSecs) newSettings.sampleDurationSecs = setting.sampleDurationSecs;
         }
 
-        return newSettings;
+        combinedSettings.samples = addedSamples.ToArray();
+        combinedSettings.sampleLength = combinedSettings.samples.Length;
+        combinedSettings.sampleRate = GetLargestSampleRate(sounds);
+
+        combinedSettings.audioClip = AudioClip.Create("multiplied_tone", combinedSettings.sampleLength, 1, combinedSettings.sampleRate, false);
+
+        ToneGenerator.Instance.RefactorSamplesInClip(combinedSettings);
+
+        return combinedSettings;
+    }
+
+    private int GetLargestSampleRate(Sound[] sounds)
+    {
+        int largestSampleRate= 0;
+        foreach(Sound setting in sounds)
+        {
+            if (setting.sampleRate > largestSampleRate)
+            {
+                largestSampleRate = setting.sampleRate;
+            }
+        }
+
+        return largestSampleRate;
     }
 
     #endregion

@@ -60,6 +60,8 @@ public class ToneGenerator : MonoBehaviour
 
     private void Start()
     {
+        audioSource = this.GetComponent<AudioSource>();
+
         generatedSound.audioClip = CreateToneAudioClip(generatedSound);
         secondarySound.audioClip = CreateToneAudioClip(secondarySound);
 
@@ -68,6 +70,11 @@ public class ToneGenerator : MonoBehaviour
         Sound[] combinedSettings = new Sound[2];
         combinedSettings[0] = generatedSound;
         combinedSettings[1] = secondarySound;
+
+        Sound newSound = ToneModifiers.Instance.MultiplyAudioClips(combinedSettings);
+        placeHolder = newSound;
+        audioSource.PlayOneShot(newSound.audioClip);
+        
     }
 
     #region Generating Audioclip
