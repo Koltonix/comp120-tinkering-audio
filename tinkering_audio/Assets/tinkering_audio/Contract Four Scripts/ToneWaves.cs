@@ -184,6 +184,7 @@ public class ToneWaves : MonoBehaviour
             }
         }
 
+        soundSettings.waveType = WaveType.PERLIN_NOISE;
         soundSettings.audioClip.SetData(soundSettings.samples, 0);
         return soundSettings.audioClip;
     }

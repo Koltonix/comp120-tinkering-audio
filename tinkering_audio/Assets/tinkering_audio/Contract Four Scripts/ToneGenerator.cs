@@ -65,9 +65,9 @@ public class ToneGenerator : MonoBehaviour
         generatedSound.audioClip = CreateToneAudioClip(generatedSound);
         secondarySound.audioClip = CreateToneAudioClip(secondarySound);
 
-        secondarySound.audioClip = ToneWaves.Instance.ConvertClipToSquareWave(secondarySound);
+        ToneWaves.Instance.RefactorAudioClipWave(secondarySound);
 
-        placeHolder = ToneModifiers.Instance.InsertAudioClip(generatedSound, secondarySound, 5);
+        placeHolder = ToneModifiers.Instance.InsertAudioClip(generatedSound, secondarySound, generatedSound.samples.Length);
         //placeHolder.audioClip = ToneModifiers.Instance.ChangeVolume(placeHolder.audioClip, 0.5f);
         //Sound[] combinedSettings = new Sound[2];
         //combinedSettings[0] = generatedSound;

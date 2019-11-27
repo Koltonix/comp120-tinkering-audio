@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028328, g: 0.22571322, b: 0.30692163, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5402,7 +5402,7 @@ MonoBehaviour:
   secondarySound:
     audioClip: {fileID: 0}
     frequency: 1500
-    waveType: 1
+    waveType: 2
     samples: []
     sampleRate: 44100
     sampleDurationSecs: 2
