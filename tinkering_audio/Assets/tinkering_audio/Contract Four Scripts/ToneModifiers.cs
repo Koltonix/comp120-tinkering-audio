@@ -132,16 +132,16 @@ public class ToneModifiers : MonoBehaviour
     /// </returns>
     private int GetLargestSoundSampleRate(Sound[] sounds)
     {
-        int largestSampleRate= 0;
+        int largestSampleRateLength = 0;
         foreach(Sound setting in sounds)
         {
-            if (setting.sampleRate > largestSampleRate)
+            if (setting.samples.Length > largestSampleRateLength)
             {
-                largestSampleRate = setting.sampleRate;
+                largestSampleRateLength = setting.samples.Length;
             }
         }
 
-        return largestSampleRate;
+        return largestSampleRateLength;
     }
 
     /// <summary>
@@ -178,6 +178,20 @@ public class ToneModifiers : MonoBehaviour
         return frequency;
     }
 
+    private float GetLongestSamplesLength(Sound[] sounds)
+    {
+        float longestSampleLength = 0;
+        foreach (Sound setting in sounds)
+        {
+            if (setting.sampleLength > longestSampleLength)
+            {
+                longestSampleLength = setting.sampleDurationSecs;
+            }
+        }
+
+        return longestSampleLength;
+    }
+
     #endregion
 
     #region Inserting Audio
@@ -185,17 +199,30 @@ public class ToneModifiers : MonoBehaviour
     public Sound InsertAudioClip(Sound originalSound, Sound insertingSound, int insertingPosition)
     {
         Sound[] sounds = { originalSound, insertingSound };
-        Sound insertedSound = new Sound();
+        Sound newInsertedSound = new Sound();
 
-        insertedSound.sampleLength = GetLargestSoundSampleRate(sounds);
-        insertedSound.samples = new float[insertedSound.sampleLength];
+        newInsertedSound.sampleLength = Mathf.RoundToInt((originalSound.sampleDurationSecs * originalSound.sampleRate) + 
+                                                        (insertingSound.sampleDurationSecs * insertingSound.sampleRate));
+        newInsertedSound.samples = new float[newInsertedSound.sampleLength];
 
         List<float> samples = ConvertFloatArrayToList(originalSound.samples);
 
-        for (int i = 0; i < insertedSound.samples.Length; i++)
+        for (int i = 0; i < insertingSound.samples.Length; i++)
         {
-            samples.Insert(insertingPosition + i, insertedSound.samples[i]);
-        }        
+            samples.Insert(insertingPosition, insertingSound.samples[i]);
+        }
+
+        newInsertedSound.samples = samples.ToArray();
+        newInsertedSound.sampleDurationSecs = originalSound.sampleDurationSecs + insertingSound.sampleDurationSecs;
+
+        newInsertedSound.sampleLength = newInsertedSound.samples.Length;
+        newInsertedSound.sampleRate = GetLargestSoundSampleRate(sounds);
+
+        newInsertedSound.audioClip = AudioClip.Create("inserted_tone", newInsertedSound.sampleLength, 1, newInsertedSound.sampleRate, false);
+
+        newInsertedSound.frequency = AddFrequencies(sounds);
+
+        return newInsertedSound;
     }
 
     private List<float> ConvertFloatArrayToList(float[] samples)

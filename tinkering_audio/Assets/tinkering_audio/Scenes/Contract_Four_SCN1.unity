@@ -5394,7 +5394,7 @@ MonoBehaviour:
   generatedSound:
     audioClip: {fileID: 0}
     frequency: 1500
-    waveType: 2
+    waveType: 0
     samples: []
     sampleRate: 44100
     sampleDurationSecs: 0.5
@@ -5402,7 +5402,7 @@ MonoBehaviour:
   secondarySound:
     audioClip: {fileID: 0}
     frequency: 1500
-    waveType: 0
+    waveType: 1
     samples: []
     sampleRate: 44100
     sampleDurationSecs: 2
