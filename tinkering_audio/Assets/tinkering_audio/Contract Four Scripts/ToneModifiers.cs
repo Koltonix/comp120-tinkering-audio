@@ -93,24 +93,24 @@ public class ToneModifiers : MonoBehaviour
         {
             combinedSettings.frequency += sounds[i].frequency;
 
-            for (int j = 0; j < sounds[i].Samples.Length; j++)
+            for (int j = 0; j < sounds[i].samples.Length; j++)
             {
                 if (addedSamples.Count - 1 < j)
                 {
-                    addedSamples.Add(sounds[i].Samples[j]);
+                    addedSamples.Add(sounds[i].samples[j]);
                 }
 
                 else
                 {
-                    addedSamples[j] += sounds[i].Samples[j];
+                    addedSamples[j] += sounds[i].samples[j];
                 }
             }
         }
 
         combinedSettings.sampleDurationSecs = GetLongestSoundDuration(sounds);
-        combinedSettings.Samples = addedSamples.ToArray();
+        combinedSettings.samples = addedSamples.ToArray();
 
-        combinedSettings.sampleLength = Mathf.RoundToInt(combinedSettings.Samples.Length * combinedSettings.sampleDurationSecs);
+        combinedSettings.sampleLength = Mathf.RoundToInt(combinedSettings.samples.Length * combinedSettings.sampleDurationSecs);
         combinedSettings.sampleRate = GetLargestSoundSampleRate(sounds);
 
         combinedSettings.audioClip = AudioClip.Create("multiplied_tone", combinedSettings.sampleLength, 1, combinedSettings.sampleRate, false);
@@ -167,6 +167,48 @@ public class ToneModifiers : MonoBehaviour
         return longestSound;
     }
 
+    private float AddFrequencies(Sound[] sounds)
+    {
+        float frequency = 0;
+        foreach(Sound setting in sounds)
+        {
+            frequency += setting.frequency;
+        }
+
+        return frequency;
+    }
+
+    #endregion
+
+    #region Inserting Audio
+
+    public Sound InsertAudioClip(Sound originalSound, Sound insertingSound, int insertingPosition)
+    {
+        Sound[] sounds = { originalSound, insertingSound };
+        Sound insertedSound = new Sound();
+
+        insertedSound.sampleLength = GetLargestSoundSampleRate(sounds);
+        insertedSound.samples = new float[insertedSound.sampleLength];
+
+        List<float> samples = ConvertFloatArrayToList(originalSound.samples);
+
+        for (int i = 0; i < insertedSound.samples.Length; i++)
+        {
+            samples.Insert(insertingPosition + i, insertedSound.samples[i]);
+        }        
+    }
+
+    private List<float> ConvertFloatArrayToList(float[] samples)
+    {
+        List<float> list = new List<float>();
+        for (int i = 0; i < samples.Length; i++)
+        {
+            list.Add(samples[i]);
+        }
+
+        return list;
+    }
+
     #endregion
 
     #region Pitch
@@ -183,15 +225,15 @@ public class ToneModifiers : MonoBehaviour
     /// </remarks>
     public void IncreasePitch(Sound soundSettings, int tempoModifier)
     {
-        float[] alteredSamples = new float[Mathf.FloorToInt(soundSettings.Samples.Length * tempoModifier)];
+        float[] alteredSamples = new float[Mathf.FloorToInt(soundSettings.samples.Length * tempoModifier)];
 
         int samplesIndex = 0;
         int alteredSamplesIndex = 0;
         while (samplesIndex < alteredSamples.Length - 1)
         {
-            if (samplesIndex < soundSettings.Samples.Length - 1)
+            if (samplesIndex < soundSettings.samples.Length - 1)
             {
-                alteredSamples[alteredSamplesIndex] = soundSettings.Samples[samplesIndex];
+                alteredSamples[alteredSamplesIndex] = soundSettings.samples[samplesIndex];
             }
 
             if (alteredSamplesIndex % tempoModifier == 0)
@@ -202,7 +244,7 @@ public class ToneModifiers : MonoBehaviour
             alteredSamplesIndex++;
         }
 
-        soundSettings.Samples = alteredSamples;
+        soundSettings.samples = alteredSamples;
     }
     #endregion
 }

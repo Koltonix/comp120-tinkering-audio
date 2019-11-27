@@ -3100,11 +3100,11 @@ MonoBehaviour:
   currentSoundSettings:
     audioClip: {fileID: 0}
     frequency: 0
+    waveType: 0
     samples: []
     sampleRate: 0
     sampleDurationSecs: 0
     sampleLength: 0
-    waveType: 0
   frequencySlider: {fileID: 0}
   frequencyText: {fileID: 0}
   sampleRateSlider: {fileID: 0}
@@ -5058,11 +5058,11 @@ MonoBehaviour:
   currentSoundSettings:
     audioClip: {fileID: 0}
     frequency: 0
+    waveType: 0
     samples: []
     sampleRate: 0
     sampleDurationSecs: 0
     sampleLength: 0
-    waveType: 0
   frequencySlider: {fileID: 1692069552}
   frequencyText: {fileID: 976703330}
   sampleRateSlider: {fileID: 2069023560}
@@ -5394,27 +5394,27 @@ MonoBehaviour:
   generatedSound:
     audioClip: {fileID: 0}
     frequency: 1500
+    waveType: 2
     samples: []
     sampleRate: 44100
     sampleDurationSecs: 0.5
     sampleLength: 0
-    waveType: 1
   secondarySound:
     audioClip: {fileID: 0}
     frequency: 1500
+    waveType: 0
     samples: []
     sampleRate: 44100
     sampleDurationSecs: 2
     sampleLength: 0
-    waveType: 0
   placeHolder:
     audioClip: {fileID: 0}
     frequency: 0
+    waveType: 0
     samples: []
     sampleRate: 0
     sampleDurationSecs: 0
     sampleLength: 0
-    waveType: 0
   samplesList: []
   squarePrefab: {fileID: 4582863248361522357, guid: ddaacda13042e5d4cbd326b103201e01,
     type: 3}
@@ -6537,6 +6537,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 955ff3e9745aeb149a02fdd0e465e18a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  randomSoundSettings:
+    audioClip: {fileID: 0}
+    frequency: 0
+    waveType: 0
+    samples: []
+    sampleRate: 0
+    sampleDurationSecs: 0
+    sampleLength: 0
+  perlinNoiseHeight: 256
+  perlinNoiseWidth: 256
+  perlinNoiseScale: 20
 --- !u!4 &1866048726
 Transform:
   m_ObjectHideFlags: 0

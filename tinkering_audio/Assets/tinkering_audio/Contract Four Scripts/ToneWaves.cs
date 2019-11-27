@@ -19,11 +19,11 @@ public class ToneWaves : MonoBehaviour
 
     [Header("Perlin Noise")]
     [SerializeField]
-    private int perlinNoiseHeight;
+    private int perlinNoiseHeight = 256;
     [SerializeField]
-    private int perlinNoiseWidth;
+    private int perlinNoiseWidth = 256;
     [SerializeField]
-    private float perlinNoiseScale;
+    private float perlinNoiseScale = 20f;
     private Vector2 perlinNoiseOffset;
 
     #region Singleton Instance
@@ -35,7 +35,12 @@ public class ToneWaves : MonoBehaviour
     }
     #endregion
 
-    public void ChangeAudioClipToSquare(Sound soundSetting)
+    /// <summary>
+    /// Used in conjunction with the enums to refactor an audioclip automatically 
+    /// with the new wave type rather than me manually assigning a function to each one
+    /// </summary>
+    /// <param name="soundSetting"></param>
+    public void RefactorAudioClipWave(Sound soundSetting)
     {
         if (soundSetting.waveType == WaveType.STATIC) return;
 
@@ -107,20 +112,20 @@ public class ToneWaves : MonoBehaviour
     /// </returns>
     public float[] ConvertWaveToSquareWave(Sound soundSettings)
     {
-        for (int i = 0; i < soundSettings.Samples.Length - 1; i++)
+        for (int i = 0; i < soundSettings.samples.Length - 1; i++)
         {
-            if (soundSettings.Samples[i] > 0)
+            if (soundSettings.samples[i] > 0)
             {
-                soundSettings.Samples[i] = 1;
+                soundSettings.samples[i] = 1;
             }
 
             else
             {
-                soundSettings.Samples[i] = -1;
+                soundSettings.samples[i] = -1;
             }
         }
 
-        return soundSettings.Samples;
+        return soundSettings.samples;
     }
 
     /// <summary>
@@ -137,54 +142,62 @@ public class ToneWaves : MonoBehaviour
     /// </returns>
     public AudioClip ConvertClipToSquareWave(Sound soundSettings)
     {
-        for (int i = 0; i < soundSettings.Samples.Length - 1; i++)
+        for (int i = 0; i < soundSettings.samples.Length - 1; i++)
         {
-            if (soundSettings.Samples[i] > 0)
+            if (soundSettings.samples[i] > 0)
             {
-                soundSettings.Samples[i] = 1;
+                soundSettings.samples[i] = 1;
             }
 
             else
             {
-                soundSettings.Samples[i] = -1;
+                soundSettings.samples[i] = -1;
             }
         }
 
-        soundSettings.audioClip.SetData(soundSettings.Samples, 0);
+        soundSettings.audioClip.SetData(soundSettings.samples, 0);
         return soundSettings.audioClip;
     }
 
 
     #endregion
 
-    #region Perlin Noise Conveter
+    #region Perlin Noise Converter
     public AudioClip ConvertClipToPerlinNoise(Sound soundSettings)
     {
-        float[] samples = new float[perlinNoiseHeight * perlinNoiseWidth];
+        float[] samples = new float[soundSettings.sampleLength];
         perlinNoiseOffset = GetRandomOffset();
 
         int index = 0;
-        for (int x = 0; x < perlinNoiseWidth; x++)
+        for (int x = 0; x < soundSettings.sampleLength; x++)
         {
-            for (int y = 0; y < perlinNoiseHeight; y++)
+            for (int y = 0; y < soundSettings.sampleLength; y++)
             {
+                if (index > soundSettings.sampleLength - 1)
+                {
+                    soundSettings.audioClip.SetData(soundSettings.samples, 0);
+                    return soundSettings.audioClip;
+                }
+
                 soundSettings.samples[index] = GetRandomNoiseValue(x, y);
                 index++;
             }
         }
 
-        soundSettings.audioClip.SetData(soundSettings.Samples, 0);
+        soundSettings.audioClip.SetData(soundSettings.samples, 0);
         return soundSettings.audioClip;
     }
 
-    #region Noise Generation
     /// <summary>
-    /// 
+    /// Returns a random offset value to be used in the perlin noise generation
+    /// to ensure that it is random each time it is played
     /// </summary>
     /// <remarks>
     /// Sourced by https://www.youtube.com/watch?v=bG0uEXV6aHQ
     /// </remarks>
-    /// <returns></returns>
+    /// <returns>
+    /// Returns a Vector2 which holds the X and Y offset values
+    /// </returns>
     private Vector2 GetRandomOffset()
     {
         Vector2 offset = Vector2.zero;
@@ -195,14 +208,18 @@ public class ToneWaves : MonoBehaviour
 
 
     /// <summary>
-    /// 
+    /// Uses an X and Y determine a perlin noise value at a given coordinate 
+    /// which I then later assign to the samples
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <remarks>
     /// Sourced by https://www.youtube.com/watch?v=bG0uEXV6aHQ
     /// </remarks>
-    /// <returns></returns>
+    /// <returns>
+    /// Returns a perlin noise value depending on the colour of the position
+    /// of the coordinate
+    /// </returns>
     private float GetRandomNoiseValue(int x, int y)
     {
         float xCoord = (float)x / perlinNoiseWidth * perlinNoiseScale + perlinNoiseOffset.x;

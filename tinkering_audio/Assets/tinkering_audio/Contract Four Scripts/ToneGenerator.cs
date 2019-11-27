@@ -26,28 +26,13 @@ public class Sound
 {
     public AudioClip audioClip;
     public float frequency;
+    public WaveType waveType;
 
-    // Using a getter and setter to automatically convert waves that
-    // have set in the inspector rather than doing it through code manually
     public float[] samples;
-    public float[] Samples
-    {
-        get { return samples; }
-        set
-        {
-            samples = value;
-            if (this.audioClip != null) ToneWaves.Instance.ChangeAudioClipToSquare(this);
-
-        }
-    }
-
-
     public int sampleRate;
     public float sampleDurationSecs;
     [HideInInspector]
     public int sampleLength;
-
-    public WaveType waveType;
 }
 
 [RequireComponent(typeof(AudioSource))]
@@ -92,6 +77,8 @@ public class ToneGenerator : MonoBehaviour
         //SpawnSampleSquare(newSound.Samples, 200);
 
         generatedSound.audioClip = CreateToneAudioClip(generatedSound);
+        ToneWaves.Instance.RefactorAudioClipWave(generatedSound);
+        audioSource.PlayOneShot(generatedSound.audioClip);
         
     }
 
@@ -120,15 +107,15 @@ public class ToneGenerator : MonoBehaviour
 
         AudioClip audioClip = AudioClip.Create("new_tone", soundSettings.sampleLength, 1, soundSettings.sampleRate, false);
 
-        soundSettings.Samples = new float[soundSettings.sampleLength];
+        soundSettings.samples = new float[soundSettings.sampleLength];
         for (int i = 0; i < soundSettings.sampleLength; i++)
         {
             float s = ToneWaves.Instance.GetSinValue(soundSettings.frequency, i, soundSettings.sampleRate);
             float v = s * maxValue;
-            soundSettings.Samples[i] = v;
+            soundSettings.samples[i] = v;
         }
 
-        audioClip.SetData(soundSettings.Samples, 0);
+        audioClip.SetData(soundSettings.samples, 0);
         return audioClip;
     }
  
@@ -143,7 +130,7 @@ public class ToneGenerator : MonoBehaviour
     {
         if (soundSettings.audioClip != null)
         {
-            soundSettings.audioClip.SetData(soundSettings.Samples, 0);
+            soundSettings.audioClip.SetData(soundSettings.samples, 0);
         }
 
         else
