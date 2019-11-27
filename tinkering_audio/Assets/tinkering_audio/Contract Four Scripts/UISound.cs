@@ -71,13 +71,13 @@ public class UISound : MonoBehaviour
 
     private void ChangeAudioClipWave()
     {
-        if (currentSoundSettings.waveType == WaveType.Sine)
+        if (currentSoundSettings.waveType == WaveType.SINE)
         {
             //Returns since all default waves are Sine waves in this instance
             return;
         }
 
-        else if (currentSoundSettings.waveType == WaveType.Square)
+        else if (currentSoundSettings.waveType == WaveType.SQUARE)
         {
             currentSoundSettings.audioClip = ToneWaves.Instance.ConvertClipToSquareWave(currentSoundSettings);
         }

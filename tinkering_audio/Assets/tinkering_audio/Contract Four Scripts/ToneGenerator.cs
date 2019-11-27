@@ -15,9 +15,10 @@ using UnityEngine;
 
 public enum WaveType
 {
-    Sine = 0,
-    Square = 1,
-    Dynamic
+    SINE = 0,
+    SQUARE = 1,
+    PERLIN_NOISE = 2,
+    STATIC
 };
 
 [Serializable]
@@ -26,7 +27,21 @@ public class Sound
     public AudioClip audioClip;
     public float frequency;
 
+    // Using a getter and setter to automatically convert waves that
+    // have set in the inspector rather than doing it through code manually
     public float[] samples;
+    public float[] Samples
+    {
+        get { return samples; }
+        set
+        {
+            samples = value;
+            if (this.audioClip != null) ToneWaves.Instance.ChangeAudioClipToSquare(this);
+
+        }
+    }
+
+
     public int sampleRate;
     public float sampleDurationSecs;
     [HideInInspector]
@@ -62,18 +77,21 @@ public class ToneGenerator : MonoBehaviour
     {
         audioSource = this.GetComponent<AudioSource>();
 
+        //generatedSound.audioClip = CreateToneAudioClip(generatedSound);
+        //secondarySound.audioClip = CreateToneAudioClip(secondarySound);
+
+        //Sound[] combinedSettings = new Sound[2];
+        //combinedSettings[0] = generatedSound;
+        //combinedSettings[1] = secondarySound;
+
+        //Sound newSound = ToneModifiers.Instance.MultiplyAudioClips(combinedSettings);
+        //newSound.audioClip = ToneModifiers.Instance.ChangeVolume(newSound.audioClip, 0.1f);
+        //placeHolder = newSound;
+        //audioSource.PlayOneShot(newSound.audioClip);
+
+        //SpawnSampleSquare(newSound.Samples, 200);
+
         generatedSound.audioClip = CreateToneAudioClip(generatedSound);
-        secondarySound.audioClip = CreateToneAudioClip(secondarySound);
-
-        generatedSound.audioClip = ToneWaves.Instance.ConvertClipToSquareWave(generatedSound);
-
-        Sound[] combinedSettings = new Sound[2];
-        combinedSettings[0] = generatedSound;
-        combinedSettings[1] = secondarySound;
-
-        Sound newSound = ToneModifiers.Instance.MultiplyAudioClips(combinedSettings);
-        placeHolder = newSound;
-        audioSource.PlayOneShot(newSound.audioClip);
         
     }
 
@@ -102,15 +120,15 @@ public class ToneGenerator : MonoBehaviour
 
         AudioClip audioClip = AudioClip.Create("new_tone", soundSettings.sampleLength, 1, soundSettings.sampleRate, false);
 
-        soundSettings.samples = new float[soundSettings.sampleLength];
+        soundSettings.Samples = new float[soundSettings.sampleLength];
         for (int i = 0; i < soundSettings.sampleLength; i++)
         {
             float s = ToneWaves.Instance.GetSinValue(soundSettings.frequency, i, soundSettings.sampleRate);
             float v = s * maxValue;
-            soundSettings.samples[i] = v;
+            soundSettings.Samples[i] = v;
         }
 
-        audioClip.SetData(soundSettings.samples, 0);
+        audioClip.SetData(soundSettings.Samples, 0);
         return audioClip;
     }
  
@@ -125,7 +143,7 @@ public class ToneGenerator : MonoBehaviour
     {
         if (soundSettings.audioClip != null)
         {
-            soundSettings.audioClip.SetData(soundSettings.samples, 0);
+            soundSettings.audioClip.SetData(soundSettings.Samples, 0);
         }
 
         else

@@ -87,29 +87,31 @@ public class ToneModifiers : MonoBehaviour
     {
         List<float> addedSamples = new List<float>();
         Sound combinedSettings = new Sound();
-        combinedSettings.waveType = WaveType.Dynamic;
+        combinedSettings.waveType = WaveType.STATIC;
 
         for (int i = 0; i < sounds.Length; i++)
         {
             combinedSettings.frequency += sounds[i].frequency;
 
-            for (int j = 0; j < sounds[i].samples.Length; j++)
+            for (int j = 0; j < sounds[i].Samples.Length; j++)
             {
                 if (addedSamples.Count - 1 < j)
                 {
-                    addedSamples.Add(sounds[i].samples[j]);
+                    addedSamples.Add(sounds[i].Samples[j]);
                 }
 
                 else
                 {
-                    addedSamples[j] += sounds[i].samples[j];
+                    addedSamples[j] += sounds[i].Samples[j];
                 }
             }
         }
 
-        combinedSettings.samples = addedSamples.ToArray();
-        combinedSettings.sampleLength = combinedSettings.samples.Length;
-        combinedSettings.sampleRate = GetLargestSampleRate(sounds);
+        combinedSettings.sampleDurationSecs = GetLongestSoundDuration(sounds);
+        combinedSettings.Samples = addedSamples.ToArray();
+
+        combinedSettings.sampleLength = Mathf.RoundToInt(combinedSettings.Samples.Length * combinedSettings.sampleDurationSecs);
+        combinedSettings.sampleRate = GetLargestSoundSampleRate(sounds);
 
         combinedSettings.audioClip = AudioClip.Create("multiplied_tone", combinedSettings.sampleLength, 1, combinedSettings.sampleRate, false);
 
@@ -128,7 +130,7 @@ public class ToneModifiers : MonoBehaviour
     /// Return an integer that is the largest sample rate out of all of the
     /// sounds compared with
     /// </returns>
-    private int GetLargestSampleRate(Sound[] sounds)
+    private int GetLargestSoundSampleRate(Sound[] sounds)
     {
         int largestSampleRate= 0;
         foreach(Sound setting in sounds)
@@ -140,6 +142,29 @@ public class ToneModifiers : MonoBehaviour
         }
 
         return largestSampleRate;
+    }
+
+    /// <summary>
+    /// Used to get the longest sound duration period since when I'm adding
+    /// the clips together I want the longest length possible to avoid any 
+    /// sort of data loss.
+    /// </summary>
+    /// <param name="sounds"></param>
+    /// <returns>
+    /// A float that is the longest amount of time of any of the audioclips
+    /// </returns>
+    private float GetLongestSoundDuration(Sound[] sounds)
+    {
+        float longestSound = 0;
+        foreach (Sound setting in sounds)
+        {
+            if (setting.sampleDurationSecs > longestSound)
+            {
+                longestSound = setting.sampleDurationSecs;
+            }
+        }
+
+        return longestSound;
     }
 
     #endregion
@@ -158,15 +183,15 @@ public class ToneModifiers : MonoBehaviour
     /// </remarks>
     public void IncreasePitch(Sound soundSettings, int tempoModifier)
     {
-        float[] alteredSamples = new float[Mathf.FloorToInt(soundSettings.samples.Length * tempoModifier)];
+        float[] alteredSamples = new float[Mathf.FloorToInt(soundSettings.Samples.Length * tempoModifier)];
 
         int samplesIndex = 0;
         int alteredSamplesIndex = 0;
         while (samplesIndex < alteredSamples.Length - 1)
         {
-            if (samplesIndex < soundSettings.samples.Length - 1)
+            if (samplesIndex < soundSettings.Samples.Length - 1)
             {
-                alteredSamples[alteredSamplesIndex] = soundSettings.samples[samplesIndex];
+                alteredSamples[alteredSamplesIndex] = soundSettings.Samples[samplesIndex];
             }
 
             if (alteredSamplesIndex % tempoModifier == 0)
@@ -177,7 +202,7 @@ public class ToneModifiers : MonoBehaviour
             alteredSamplesIndex++;
         }
 
-        soundSettings.samples = alteredSamples;
+        soundSettings.Samples = alteredSamples;
     }
     #endregion
 }

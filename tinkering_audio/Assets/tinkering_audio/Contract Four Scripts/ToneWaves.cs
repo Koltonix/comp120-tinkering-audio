@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 //-----------------------------------------------------------------------
 // <copyright file="ToneWaves.cs">
@@ -15,6 +13,19 @@ using UnityEngine;
 
 public class ToneWaves : MonoBehaviour
 {
+    [Header("Random Sound")]
+    [SerializeField]
+    private Sound randomSoundSettings;
+
+    [Header("Perlin Noise")]
+    [SerializeField]
+    private int perlinNoiseHeight;
+    [SerializeField]
+    private int perlinNoiseWidth;
+    [SerializeField]
+    private float perlinNoiseScale;
+    private Vector2 perlinNoiseOffset;
+
     #region Singleton Instance
     public static ToneWaves Instance;
     private void Awake()
@@ -23,6 +34,21 @@ public class ToneWaves : MonoBehaviour
         else Destroy(this.gameObject);
     }
     #endregion
+
+    public void ChangeAudioClipToSquare(Sound soundSetting)
+    {
+        if (soundSetting.waveType == WaveType.STATIC) return;
+
+        if (soundSetting.waveType == WaveType.SINE)
+        {
+            soundSetting.audioClip = ConvertClipToSquareWave(soundSetting);
+        }
+
+        if (soundSetting.waveType == WaveType.PERLIN_NOISE)
+        {
+            soundSetting.audioClip = ConvertClipToPerlinNoise(soundSetting);
+        }
+    }
 
     #region Sine Wave
     /// <summary>
@@ -81,20 +107,20 @@ public class ToneWaves : MonoBehaviour
     /// </returns>
     public float[] ConvertWaveToSquareWave(Sound soundSettings)
     {
-        for (int i = 0; i < soundSettings.samples.Length - 1; i++)
+        for (int i = 0; i < soundSettings.Samples.Length - 1; i++)
         {
-            if (soundSettings.samples[i] > 0)
+            if (soundSettings.Samples[i] > 0)
             {
-                soundSettings.samples[i] = 1;
+                soundSettings.Samples[i] = 1;
             }
 
             else
             {
-                soundSettings.samples[i] = -1;
+                soundSettings.Samples[i] = -1;
             }
         }
 
-        return soundSettings.samples;
+        return soundSettings.Samples;
     }
 
     /// <summary>
@@ -111,23 +137,80 @@ public class ToneWaves : MonoBehaviour
     /// </returns>
     public AudioClip ConvertClipToSquareWave(Sound soundSettings)
     {
-        for (int i = 0; i < soundSettings.samples.Length - 1; i++)
+        for (int i = 0; i < soundSettings.Samples.Length - 1; i++)
         {
-            if (soundSettings.samples[i] > 0)
+            if (soundSettings.Samples[i] > 0)
             {
-                soundSettings.samples[i] = 1;
+                soundSettings.Samples[i] = 1;
             }
 
             else
             {
-                soundSettings.samples[i] = -1;
+                soundSettings.Samples[i] = -1;
             }
         }
 
-        soundSettings.audioClip.SetData(soundSettings.samples, 0);
+        soundSettings.audioClip.SetData(soundSettings.Samples, 0);
         return soundSettings.audioClip;
     }
 
+
+    #endregion
+
+    #region Perlin Noise Conveter
+    public AudioClip ConvertClipToPerlinNoise(Sound soundSettings)
+    {
+        float[] samples = new float[perlinNoiseHeight * perlinNoiseWidth];
+        perlinNoiseOffset = GetRandomOffset();
+
+        int index = 0;
+        for (int x = 0; x < perlinNoiseWidth; x++)
+        {
+            for (int y = 0; y < perlinNoiseHeight; y++)
+            {
+                soundSettings.samples[index] = GetRandomNoiseValue(x, y);
+                index++;
+            }
+        }
+
+        soundSettings.audioClip.SetData(soundSettings.Samples, 0);
+        return soundSettings.audioClip;
+    }
+
+    #region Noise Generation
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// Sourced by https://www.youtube.com/watch?v=bG0uEXV6aHQ
+    /// </remarks>
+    /// <returns></returns>
+    private Vector2 GetRandomOffset()
+    {
+        Vector2 offset = Vector2.zero;
+        offset.x = Random.Range(0, 9999f);
+        offset.y = Random.Range(0, 9999f);
+        return offset;
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <remarks>
+    /// Sourced by https://www.youtube.com/watch?v=bG0uEXV6aHQ
+    /// </remarks>
+    /// <returns></returns>
+    private float GetRandomNoiseValue(int x, int y)
+    {
+        float xCoord = (float)x / perlinNoiseWidth * perlinNoiseScale + perlinNoiseOffset.x;
+        float yCoord = (float)y / perlinNoiseHeight * perlinNoiseScale + perlinNoiseOffset.y;
+
+        float perlinSample = Mathf.PerlinNoise(xCoord, yCoord);
+        return perlinSample;
+    }
 
     #endregion
 
