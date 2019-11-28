@@ -10,7 +10,7 @@ using UnityEditor;
 // </copyright>
 // <author> Ludovico Bitti
 // <author> Christopher Philip Robertson
-// <summary> 
+// <summary> in program i am generating the sound waves that will be playid once the coin is hit by the player
 // <this program takes care of 
 // </summary>
 //----
@@ -24,14 +24,15 @@ public class PickUpCoin : MonoBehaviour
     private void Start()
     {
         audioSource = this.GetComponent<AudioSource>();
+        carAudioClip = CreateAudioToneClip(250);
+        carAudioClip = RefactorAudioClip(carAudioClip, frequency: 2500, sampleRate: 40100, sampleLength: 80000);
+
     }
 
     private void OnTriggerEnter(Collider col)
     {
         if (col.CompareTag("Player"))
         {
-            carAudioClip = CreateAudioToneClip(250);
-            carAudioClip = RefactorAudioClip(carAudioClip,frequency: 2500,sampleRate: 40100, sampleLength: 40100*2);
             audioSource.PlayOneShot(carAudioClip);
             SaveWavFile(carAudioClip);
         }
@@ -42,7 +43,7 @@ public class PickUpCoin : MonoBehaviour
         int sampleDurationSecs = 2;
         int sampleRate = 40100;
         int sampleLength = sampleRate * sampleDurationSecs;
-        float maxValue = 1f;
+        float maxValue = 2f;
 
         var audioClip = AudioClip.Create("Sound", sampleLength, 1, sampleRate, false);
 
@@ -50,44 +51,46 @@ public class PickUpCoin : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// the for loop generate audio with different frequency and overlaying them ontop of eachother
     /// </summary>
-    /// <param name="audioClip"></param>
-    /// <param name="frequency"></param>
-    /// <param name="sampleRate"></param>
-    /// <param name="sampleLength"></param>
+    /// <param name="audioClip">clip where audio is applied to</param>
+    /// <param name="frequency">frequanzy of the generated audio</param> used 
+    /// <param name="sampleRate">how many samples per second </param>
+    /// <param name="sampleLength">how long is the sample per second</param>
     /// <returns></returns>
     /// <remarks>
     /// Christopher pair programmed this by helping me understand for loop.
     /// </remarks>
+    /// 
     private AudioClip RefactorAudioClip(AudioClip audioClip, int frequency, int sampleRate, int sampleLength)
     {
         float[] samples = new float[sampleLength];
         audioClip.GetData(samples, 0);
 
+        //create 
         for (int i = 0; i < samples.Length; i++)
         {
-            samples[i] = GenerateAudioFrame(frequency, sampleRate, i);
-            samples[i] += GenerateAudioFrame(frequency/2, sampleRate, i);
-            samples[i] += GenerateAudioFrame(frequency/3, sampleRate, i);
+            samples[i] = GenerateAudioFrame(frequency    , sampleRate, i) + 
+                         GenerateAudioFrame(frequency / 2, sampleRate, i) + 
+                         GenerateAudioFrame(frequency / 3, sampleRate, i);
 
-            samples[i] = samples[i] * 0.3f;
-            //can put if statment
+            samples[i] *= 0.3f;
         }
 
         audioClip.SetData(samples, 0);
         return audioClip;
     }
 
-    // 
-
-    private static float GenerateAudioFrame(int frequency, int sampleRate, int i)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="frequency">frequency of the sound generated</param>
+    /// <param name="sampleRate">used to </param>
+    /// <param name="i"></param>
+    /// <returns></returns>
+    private float GenerateAudioFrame(int frequency, int sampleRate, int i)
     {
-
-        float output = Mathf.Sin(2* Mathf.PI * frequency * ((float)i / (float)sampleRate) / (3f * Mathf.PI));
-        
-        return output;
-
+        return Mathf.Sin(2* Mathf.PI * frequency * ((float)i / (float)sampleRate) / (3f * Mathf.PI));
     }
 
     public void SaveWavFile(AudioClip audioClip)
