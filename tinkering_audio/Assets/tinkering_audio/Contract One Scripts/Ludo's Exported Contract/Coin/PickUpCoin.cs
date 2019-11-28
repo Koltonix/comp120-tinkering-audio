@@ -92,6 +92,6 @@ public class PickUpCoin : MonoBehaviour
 
     public void SaveWavFile(AudioClip audioClip)
     {
-        SaveWavUtil.Save("C:\\Users\\Ludovico Bitti\\Desktop\\SoundCoin.wav", audioClip);
+        SaveWav.Save("C:\\Users\\Ludovico Bitti\\Desktop\\SoundCoin.wav", audioClip);
     }
 } 

@@ -65,7 +65,7 @@ public class UISound : MonoBehaviour
     public void SaveAudioClip()
     {
         GenerateSoundClip();
-        SaveWavUtil.Save("new_audio_clip", currentSoundSettings.audioClip);
+        SaveWav.Save("new_audio_clip", currentSoundSettings.audioClip);
         print(Application.dataPath + "/Generated Clips");
     }
 
