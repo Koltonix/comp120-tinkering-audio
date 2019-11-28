@@ -83,7 +83,6 @@ public class ToneGenerator : MonoBehaviour
         //generatedSound.audioClip = CreateToneAudioClip(generatedSound);
         //ToneWaves.Instance.RefactorAudioClipWave(generatedSound);
 
-        SaveWavUtil.Save("new sound", placeHolder.audioClip);
         //audioSource.PlayOneShot(placeHolder.audioClip);
         
     }
@@ -151,7 +150,7 @@ public class ToneGenerator : MonoBehaviour
     #region Saving Sound
     private void SaveAudioClip(AudioClip clip)
     {
-        SaveWavUtil.Save(Application.dataPath, clip);
+        SaveWav.Save(Application.dataPath, clip);
     }
     #endregion
 
