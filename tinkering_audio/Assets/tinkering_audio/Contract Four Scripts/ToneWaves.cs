@@ -1,4 +1,16 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+public enum PianoKeys 
+{
+    C4,
+    D4,
+    E4,
+    F4,
+    G4,
+    A4,
+    B4
+};
 
 //-----------------------------------------------------------------------
 // <copyright file="ToneWaves.cs">
@@ -13,6 +25,15 @@
 
 public class ToneWaves : MonoBehaviour
 {
+    #region Singleton Instance
+    public static ToneWaves Instance;
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(this.gameObject);
+    }
+    #endregion
+
     [Header("Random Sound")]
     [SerializeField]
     private Sound randomSoundSettings;
@@ -25,15 +46,6 @@ public class ToneWaves : MonoBehaviour
     [SerializeField]
     private float perlinNoiseScale = 20f;
     private Vector2 perlinNoiseOffset;
-
-    #region Singleton Instance
-    public static ToneWaves Instance;
-    private void Awake()
-    {
-        if (Instance == null) Instance = this;
-        else Destroy(this.gameObject);
-    }
-    #endregion
 
     /// <summary>
     /// Used in conjunction with the enums to refactor an audioclip automatically 
@@ -230,10 +242,5 @@ public class ToneWaves : MonoBehaviour
         return perlinSample;
     }
 
-    #endregion
-
-    #region Triangle Wave
-    //https://www.fxsolver.com/browse/formulas/Sawtooth+wave
-    //https://www.fxsolver.com/browse/formulas/Triangle+wave+%28in+trigonometric+terms%29
     #endregion
 }

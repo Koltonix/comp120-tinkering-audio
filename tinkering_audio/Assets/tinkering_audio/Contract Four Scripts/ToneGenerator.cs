@@ -58,6 +58,17 @@ public class ToneGenerator : MonoBehaviour
     public List<float> samplesList = new List<float>();
     public GameObject squarePrefab;
 
+    public Dictionary<PianoKeys, int> pianoFrequencies = new Dictionary<PianoKeys, int>()
+    {
+        { PianoKeys.C4, 261 },
+        { PianoKeys.D4, 277 },
+        { PianoKeys.E4, 294 },
+        { PianoKeys.F4, 349 },
+        { PianoKeys.G4, 392 },
+        { PianoKeys.A4, 440 },
+        { PianoKeys.B4, 494 }
+    };
+
     private void Start()
     {
         audioSource = this.GetComponent<AudioSource>();
@@ -124,7 +135,16 @@ public class ToneGenerator : MonoBehaviour
         audioClip.SetData(soundSettings.samples, 0);
         return audioClip;
     }
- 
+
+    #endregion
+
+    #region Audio Key Generation
+
+    //public Sound GenerateAudioFromKey(PianoKeys[] pianoKeys, int multiplier)
+    //{
+
+    //}
+
     #endregion
 
     #region Refactor Samples

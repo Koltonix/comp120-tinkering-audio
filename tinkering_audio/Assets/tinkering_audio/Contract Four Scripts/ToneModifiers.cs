@@ -219,7 +219,6 @@ public class ToneModifiers : MonoBehaviour
         {
             samples.Insert(insertingPosition, soundToInsert.samples[i]);
         }
-        print(newInsertedSound.sampleLength);
 
         newInsertedSound.samples = samples.ToArray();
         newInsertedSound.audioClip.SetData(newInsertedSound.samples, 0);
