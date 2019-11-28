@@ -3,6 +3,17 @@
 using UnityEditor;
 #endif
 
+//-----------------------------------------------------------------------
+// <copyright file="PickUpCoin.cs">
+// MIT License Copyright (c) 2019.
+// </copyright>
+// <author> Ludovico Bitti
+// <summary> generating the sound waves that increases it's frequency depending on car velocity
+// <this program takes care of 
+// </summary>
+//----
+
+
 public class CarSound : MonoBehaviour
 {
     public static CarSound Instance;
@@ -24,37 +35,30 @@ public class CarSound : MonoBehaviour
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        outAudioClip = CreateToneAudioClip(400);
+        outAudioClip = CreateAudioToneClip(400);
         audioSource.clip = outAudioClip;
         PlayOutAudio();
-
     }
     public void PlayOutAudio()
     {
         audioSource.Play();
     }
 
-    // wave info
-    public AudioClip CreateToneAudioClip(int frequency)
-    {
-        return CreateAudioToneClip(frequency);
-    }
-
     public AudioClip CreateAudioToneClip(int frequency)
     {
         int sampleDurationSecs = 5;
-        int sampleRate = 40100;
+        int sampleRate = 44100;
         int sampleLength = sampleRate * sampleDurationSecs;
         float maxValue = 1f;
 
-        var audioClip = AudioClip.Create("Sound", sampleLength, 1, sampleRate, false);
+        var audioClip = AudioClip.Create("Sound", sampleLength, 1, sampleRate, false); // creates empty audio clip
 
-        float[] samples = new float[sampleLength];
+        float[] samples = new float[sampleLength]; //array of loats for the saple
+
         for (var i = 0; i < sampleLength; i++)
-
         {
-            float s = GenerateAudioFrame((int)(frequency * inputVelocity), sampleRate, i);
-            float v = s * maxValue;
+            float s = GenerateAudioFrame((int)(frequency * inputVelocity), sampleRate, i); //cretes sample amplitude 
+            float v = s * maxValue; //set resoult
             samples[i] = v;
         }
 
@@ -63,9 +67,8 @@ public class CarSound : MonoBehaviour
     }
 
     //create wave behaviour 
-    private static float GenerateAudioFrame(int frequency, int sampleRate, int i)
+    public float GenerateAudioFrame(int frequency, int sampleRate, int i)
     {
-
         float output = 4*(Mathf.Sin(2 * Mathf.PI * frequency * ((float)i / (float)sampleRate) / (3f*Mathf.PI)));
         
         return output;
@@ -73,11 +76,7 @@ public class CarSound : MonoBehaviour
 
     public void Update()
     {
-        GetComponent<AudioSource>().pitch = Mathf.Clamp(GetComponentInParent<Rigidbody>().velocity.magnitude/10f, 0, 2.5f);
+        GetComponent<AudioSource>().pitch = Mathf.Clamp(GetComponentInParent<Rigidbody>().velocity.magnitude/10f, 0, 2.5f); //setting pitch audio source
 
     }
-
-
-
-
 }
