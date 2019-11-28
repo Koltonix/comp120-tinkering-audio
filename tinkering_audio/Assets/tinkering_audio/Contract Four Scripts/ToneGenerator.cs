@@ -31,7 +31,7 @@ public class Sound
     public float[] samples;
     public int sampleRate;
     public float sampleDurationSecs;
-    //[HideInInspector]
+    [HideInInspector]
     public int sampleLength;
 }
 
@@ -140,10 +140,11 @@ public class ToneGenerator : MonoBehaviour
 
     #region Audio Key Generation
 
-    //public Sound GenerateAudioFromKey(PianoKeys[] pianoKeys, int multiplier)
-    //{
-
-    //}
+    public Sound GenerateAudioFromKey(PianoKeys[] pianoKeys, int multiplier)
+    {
+        int randomValue = UnityEngine.Random.Range(0, pianoFrequencies.Count);
+        string randomString = pianoFrequencies.;
+    }
 
     #endregion
 
