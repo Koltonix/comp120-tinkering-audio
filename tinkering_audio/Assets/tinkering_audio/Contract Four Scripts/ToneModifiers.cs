@@ -6,6 +6,7 @@ using UnityEngine;
 // MIT License Copyright (c) 2019.
 // </copyright>
 // <author>Christopher Philip Robertson</author>
+// <author>Ludovico Bitti</author>
 // <summary>
 // Handles the modificatino of the samples and sound clips to provide a new
 // and unique sound.

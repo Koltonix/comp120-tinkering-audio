@@ -77,10 +77,7 @@ public class UISound : MonoBehaviour
             return;
         }
 
-        else if (currentSoundSettings.waveType == WaveType.SQUARE)
-        {
-            currentSoundSettings.audioClip = ToneWaves.Instance.ConvertClipToSquareWave(currentSoundSettings);
-        }
+        ToneWaves.Instance.RefactorAudioClipWave(currentSoundSettings);
     }
 
     #region UI Functions to Invoke
