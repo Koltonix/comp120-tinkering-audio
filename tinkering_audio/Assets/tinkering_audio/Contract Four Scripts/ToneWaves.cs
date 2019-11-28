@@ -1,17 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public enum PianoKeys 
-{
-    C4,
-    D4,
-    E4,
-    F4,
-    G4,
-    A4,
-    B4
-};
-
 //-----------------------------------------------------------------------
 // <copyright file="ToneWaves.cs">
 // MIT License Copyright (c) 2019.

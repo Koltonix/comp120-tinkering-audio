@@ -21,6 +21,32 @@ public enum WaveType
     DYNAMIC
 };
 
+public enum PianoKey
+{
+    C4,
+    D4,
+    E4,
+    F4,
+    G4,
+    A4,
+    B4
+};
+
+[Serializable]
+public struct PianoNotes
+{
+    public PianoKey key;
+    public int frequency;
+
+    //{ PianoKeys.C4, 261 },
+    //{ PianoKeys.D4, 277 },
+    //{ PianoKeys.E4, 294 },
+    //{ PianoKeys.F4, 349 },
+    //{ PianoKeys.G4, 392 },
+    //{ PianoKeys.A4, 440 },
+    //{ PianoKeys.B4, 494 }
+}
+
 [Serializable]
 public class Sound
 {
@@ -58,16 +84,13 @@ public class ToneGenerator : MonoBehaviour
     public List<float> samplesList = new List<float>();
     public GameObject squarePrefab;
 
-    public Dictionary<PianoKeys, int> pianoFrequencies = new Dictionary<PianoKeys, int>()
-    {
-        { PianoKeys.C4, 261 },
-        { PianoKeys.D4, 277 },
-        { PianoKeys.E4, 294 },
-        { PianoKeys.F4, 349 },
-        { PianoKeys.G4, 392 },
-        { PianoKeys.A4, 440 },
-        { PianoKeys.B4, 494 }
-    };
+    [Header("Piano Keys")]
+    [SerializeField]
+    private PianoNotes[] pianoNotes;
+    [SerializeField]
+    private PianoKey[] pianoKeys;
+    [SerializeField]
+    private Sound pianoSound;
 
     private void Start()
     {
@@ -94,7 +117,10 @@ public class ToneGenerator : MonoBehaviour
         //generatedSound.audioClip = CreateToneAudioClip(generatedSound);
         //ToneWaves.Instance.RefactorAudioClipWave(generatedSound);
 
-        //audioSource.PlayOneShot(placeHolder.audioClip);
+        pianoSound.audioClip = GenerateAudioFromKey(pianoSound, pianoKeys);
+        pianoSound.audioClip = ToneModifiers.Instance.ChangeVolume(pianoSound.audioClip, .1f);
+
+        audioSource.PlayOneShot(placeHolder.audioClip);
         
     }
 
@@ -140,10 +166,48 @@ public class ToneGenerator : MonoBehaviour
 
     #region Audio Key Generation
 
-    public Sound GenerateAudioFromKey(PianoKeys[] pianoKeys, int multiplier)
+    public AudioClip GenerateAudioFromKey(Sound soundSettings, PianoKey[] pianoKeys)
     {
-        int randomValue = UnityEngine.Random.Range(0, pianoFrequencies.Count);
-        string randomString = pianoFrequencies.;
+        soundSettings.audioClip = CreateToneAudioClip(soundSettings);
+        float maxValue = 1f / 4f;
+
+        float maxSampleIncrease = soundSettings.samples.Length / pianoKeys.Length;
+        float maxSampleLimit = maxSampleIncrease;
+        int startingPosition = 0;
+
+        for (int i = 0; i < pianoKeys.Length; i++)
+        {
+            for (int j = startingPosition; j < soundSettings.samples.Length; j++)
+            {
+                float s = ToneWaves.Instance.GetSinValue(GetNoteFrequency(pianoKeys[i]), j, soundSettings.sampleRate);
+                float v = s * maxValue;
+                soundSettings.samples[j] = v;
+
+                if (j > maxSampleLimit)
+                {
+                    print(pianoKeys[i]);
+                    startingPosition = j;
+                    maxSampleLimit += maxSampleIncrease;
+                    i++; 
+                }
+            }
+        }
+
+        soundSettings.audioClip.SetData(soundSettings.samples, 0);
+        return soundSettings.audioClip;
+    }
+
+    private float GetNoteFrequency(PianoKey pianoKey)
+    {
+        foreach (PianoNotes key in pianoNotes)
+        {
+            if (key.key == pianoKey)
+            {
+                return key.frequency;
+            }
+        }
+
+        throw new Exception("No key of that type exists");
     }
 
     #endregion
