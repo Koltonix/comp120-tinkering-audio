@@ -5435,14 +5435,14 @@ MonoBehaviour:
     frequency: 440
   - key: 6
     frequency: 494
-  pianoKeys: 0000000001000000020000000300000004000000
+  pianoKeys: 00000000010000000200000003000000040000000500000006000000
   pianoSound:
     audioClip: {fileID: 0}
     frequency: 1500
     waveType: 0
     samples: []
     sampleRate: 44100
-    sampleDurationSecs: 3
+    sampleDurationSecs: 1
     sampleLength: 0
 --- !u!82 &1386083500
 AudioSource:

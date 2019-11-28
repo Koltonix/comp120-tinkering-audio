@@ -118,9 +118,9 @@ public class ToneGenerator : MonoBehaviour
         //ToneWaves.Instance.RefactorAudioClipWave(generatedSound);
 
         pianoSound.audioClip = GenerateAudioFromKey(pianoSound, pianoKeys);
-        pianoSound.audioClip = ToneModifiers.Instance.ChangeVolume(pianoSound.audioClip, .1f);
+        pianoSound.audioClip = ToneModifiers.Instance.ChangeVolume(pianoSound.audioClip, 1f);
 
-        audioSource.PlayOneShot(placeHolder.audioClip);
+        audioSource.PlayOneShot(pianoSound.audioClip);
         
     }
 
@@ -171,26 +171,30 @@ public class ToneGenerator : MonoBehaviour
         soundSettings.audioClip = CreateToneAudioClip(soundSettings);
         float maxValue = 1f / 4f;
 
-        float maxSampleIncrease = soundSettings.samples.Length / pianoKeys.Length;
-        float maxSampleLimit = maxSampleIncrease;
+        int maxSampleIncrease = Mathf.CeilToInt(soundSettings.samples.Length / pianoKeys.Length);
+        int maxSampleLimit = maxSampleIncrease;
         int startingPosition = 0;
 
         for (int i = 0; i < pianoKeys.Length; i++)
         {
-            for (int j = startingPosition; j < soundSettings.samples.Length; j++)
+            for (int j = startingPosition; j < maxSampleLimit; j++)
             {
+                if (j >= soundSettings.samples.Length) break;
+
                 float s = ToneWaves.Instance.GetSinValue(GetNoteFrequency(pianoKeys[i]), j, soundSettings.sampleRate);
                 float v = s * maxValue;
                 soundSettings.samples[j] = v;
 
-                if (j > maxSampleLimit)
+                if (j == maxSampleLimit - 1 && maxSampleLimit <= soundSettings.sampleRate)
                 {
-                    print(pianoKeys[i]);
+                    print(startingPosition);
                     startingPosition = j;
                     maxSampleLimit += maxSampleIncrease;
-                    i++; 
+                    i++;
                 }
             }
+
+           
         }
 
         soundSettings.audioClip.SetData(soundSettings.samples, 0);
