@@ -18,7 +18,7 @@ public enum WaveType
     SINE = 0,
     SQUARE = 1,
     PERLIN_NOISE = 2,
-    STATIC
+    DYNAMIC
 };
 
 [Serializable]
@@ -31,7 +31,7 @@ public class Sound
     public float[] samples;
     public int sampleRate;
     public float sampleDurationSecs;
-    [HideInInspector]
+    //[HideInInspector]
     public int sampleLength;
 }
 
@@ -67,7 +67,7 @@ public class ToneGenerator : MonoBehaviour
 
         ToneWaves.Instance.RefactorAudioClipWave(secondarySound);
 
-        placeHolder = ToneModifiers.Instance.InsertAudioClip(generatedSound, secondarySound, generatedSound.samples.Length);
+        placeHolder = ToneModifiers.Instance.InsertAudioClip(generatedSound, secondarySound, 2000);
         //placeHolder.audioClip = ToneModifiers.Instance.ChangeVolume(placeHolder.audioClip, 0.5f);
         //Sound[] combinedSettings = new Sound[2];
         //combinedSettings[0] = generatedSound;
@@ -83,7 +83,8 @@ public class ToneGenerator : MonoBehaviour
         //generatedSound.audioClip = CreateToneAudioClip(generatedSound);
         //ToneWaves.Instance.RefactorAudioClipWave(generatedSound);
 
-        audioSource.PlayOneShot(placeHolder.audioClip);
+        SaveWavUtil.Save("new sound", placeHolder.audioClip);
+        //audioSource.PlayOneShot(placeHolder.audioClip);
         
     }
 
@@ -107,7 +108,8 @@ public class ToneGenerator : MonoBehaviour
             throw new Exception("Audioclip must be longer than 0 seconds");
         }
 
-        soundSettings.sampleLength = Mathf.RoundToInt(soundSettings.sampleRate * soundSettings.sampleDurationSecs);
+        //Needs to be rounded to the Ceiling otherwise it might round down and lose sample data
+        soundSettings.sampleLength = Mathf.CeilToInt(soundSettings.sampleRate * soundSettings.sampleDurationSecs);
         float maxValue = 1f / 4f;
 
         AudioClip audioClip = AudioClip.Create("new_tone", soundSettings.sampleLength, 1, soundSettings.sampleRate, false);

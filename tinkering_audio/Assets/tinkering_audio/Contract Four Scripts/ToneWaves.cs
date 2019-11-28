@@ -42,7 +42,7 @@ public class ToneWaves : MonoBehaviour
     /// <param name="soundSetting"></param>
     public void RefactorAudioClipWave(Sound soundSetting)
     {
-        if (soundSetting.waveType == WaveType.STATIC) return;
+        if (soundSetting.waveType == WaveType.DYNAMIC) return;
 
         if (soundSetting.waveType == WaveType.SINE)
         {
