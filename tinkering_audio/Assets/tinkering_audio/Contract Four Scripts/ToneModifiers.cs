@@ -290,28 +290,27 @@ public class ToneModifiers : MonoBehaviour
     /// Note that this will currently keep the maximum amount of samples
     /// and will therefore remove any extras on the end that do not fit
     /// </remarks>
-    public void IncreasePitch(Sound soundSettings, int tempoModifier)
+    public void DecreaseTempo(Sound soundSettings, int tempoModifier)
     {
-        float[] alteredSamples = new float[Mathf.CeilToInt(soundSettings.samples.Length * tempoModifier)];
+        soundSettings.sampleLength = Mathf.CeilToInt(soundSettings.sampleRate * soundSettings.sampleDurationSecs) * tempoModifier;
 
-        int samplesIndex = 0;
-        int alteredSamplesIndex = 0;
-        while (samplesIndex < alteredSamples.Length - 1)
+        List<float> alteredSamples = new List<float>();
+
+        soundSettings.audioClip = AudioClip.Create("primary_decreased_tempo", soundSettings.sampleLength, 1, soundSettings.sampleRate, false);
+
+        for (int i = 0; i < soundSettings.sampleLength; i++)
         {
-            if (samplesIndex < soundSettings.samples.Length - 1)
+            for (int j = 0; j < tempoModifier; j++)
             {
-                alteredSamples[alteredSamplesIndex] = soundSettings.samples[samplesIndex];
+                if (i < soundSettings.samples.Length - 1)
+                {
+                    alteredSamples.Add(soundSettings.samples[i]);
+                }
             }
-
-            if (alteredSamplesIndex % tempoModifier == 0)
-            {
-                samplesIndex++;
-            }
-
-            alteredSamplesIndex++;
         }
 
-        soundSettings.samples = alteredSamples;
+        soundSettings.samples = alteredSamples.ToArray();
+        ToneGenerator.Instance.RefactorSamplesInClip(soundSettings);
     }
     #endregion
 }

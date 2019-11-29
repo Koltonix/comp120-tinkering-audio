@@ -62,6 +62,7 @@ public class Sound
     public float frequency;
     public WaveType waveType;
 
+    [HideInInspector]
     public float[] samples;
     public int sampleRate;
     public float sampleDurationSecs;
@@ -192,9 +193,7 @@ public class ToneGenerator : MonoBehaviour
                     maxNoteSamples += noteSampleLengthIncrease;
                     i++;
                 }
-            }
-
-           
+            }         
         }
 
         soundSettings.audioClip.SetData(soundSettings.samples, 0);
@@ -257,13 +256,19 @@ public class ToneGenerator : MonoBehaviour
         ToneWaves.Instance = FindObjectOfType<ToneWaves>();
     }
 
+    private void GenerateBothClips()
+    {
+        primarySound.audioClip = CreateToneAudioClip(primarySound);
+        secondarySound.audioClip = CreateToneAudioClip(secondarySound);
+    }
+
     /// <summary>
     /// Used on the editor button to combine the two clips
     /// </summary>
     public void CombineAudioClips()
     {
-        primarySound.audioClip = CreateToneAudioClip(primarySound);
-        secondarySound.audioClip = CreateToneAudioClip(secondarySound);
+
+        GenerateBothClips();
 
         Sound[] combinedSettings = new Sound[2];
         combinedSettings[0] = primarySound;
@@ -281,6 +286,8 @@ public class ToneGenerator : MonoBehaviour
     /// </summary>
     public void InsertAudioClips()
     {
+        GenerateBothClips();
+
         Sound insertedSound = ToneModifiers.Instance.InsertAudioClip(primarySound, secondarySound, primarySound.sampleLength);
         insertedSound.audioClip = ToneModifiers.Instance.ChangeVolume(insertedSound.audioClip, globalSound);
 
@@ -324,6 +331,15 @@ public class ToneGenerator : MonoBehaviour
         secondarySound.audioClip = ToneModifiers.Instance.ChangeVolume(secondarySound.audioClip, globalSound);
         audioSource.PlayOneShot(secondarySound.audioClip);
         SaveWav.Save("secondary_sound_clip", primarySound.audioClip);
+    }
+
+    public void HalfPrimaryPitch()
+    {
+        primarySound.audioClip = CreateToneAudioClip(primarySound);
+
+        ToneModifiers.Instance.DecreaseTempo(primarySound, 2);
+        audioSource.PlayOneShot(primarySound.audioClip);
+        SaveWav.Save("half_tempo_sound_clip", primarySound.audioClip);
     }
 
     /// <summary>
