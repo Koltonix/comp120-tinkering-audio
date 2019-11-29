@@ -112,7 +112,7 @@ public class ToneModifiers : MonoBehaviour
         combinedSettings.samples = addedSamples.ToArray();
 
         combinedSettings.sampleLength = Mathf.RoundToInt(combinedSettings.samples.Length * combinedSettings.sampleDurationSecs);
-        combinedSettings.sampleRate = GetLargestSoundSampleRate(sounds);
+        combinedSettings.sampleRate = sounds[0].sampleRate;
 
         combinedSettings.audioClip = AudioClip.Create("multiplied_tone", combinedSettings.sampleLength, 1, combinedSettings.sampleRate, false);
 
@@ -207,7 +207,7 @@ public class ToneModifiers : MonoBehaviour
                                                         (soundToInsert.sampleDurationSecs * soundToInsert.sampleRate));
         newInsertedSound.samples = new float[newInsertedSound.sampleLength];
         newInsertedSound.frequency = AddFrequencies(sounds);
-        newInsertedSound.sampleRate = GetLargestSoundSampleRate(sounds);
+        newInsertedSound.sampleRate = originalSound.sampleRate;
         newInsertedSound.sampleDurationSecs = originalSound.sampleDurationSecs + soundToInsert.sampleDurationSecs;
 
         newInsertedSound.audioClip = AudioClip.Create("inserted_tone", newInsertedSound.sampleLength, 1, newInsertedSound.sampleRate, false);

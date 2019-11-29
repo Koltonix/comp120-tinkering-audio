@@ -43,9 +43,7 @@ public class ToneWaves : MonoBehaviour
     /// <param name="soundSetting"></param>
     public void RefactorAudioClipWave(Sound soundSetting)
     {
-        if (soundSetting.waveType == WaveType.DYNAMIC) return;
-
-        if (soundSetting.waveType == WaveType.SINE)
+        if (soundSetting.waveType == WaveType.SQUARE)
         {
             soundSetting.audioClip = ConvertClipToSquareWave(soundSetting);
         }

@@ -37,14 +37,6 @@ public struct PianoNotes
 {
     public PianoKey key;
     public int frequency;
-
-    //{ PianoKeys.C4, 261 },
-    //{ PianoKeys.D4, 277 },
-    //{ PianoKeys.E4, 294 },
-    //{ PianoKeys.F4, 349 },
-    //{ PianoKeys.G4, 392 },
-    //{ PianoKeys.A4, 440 },
-    //{ PianoKeys.B4, 494 }
 }
 
 [Serializable]
@@ -72,16 +64,14 @@ public class ToneGenerator : MonoBehaviour
         else Destroy(this.gameObject);
     }
 
-    [Header("Wave Attributes")]
+    [Header("Debug Sound Data")]
     [SerializeField]
-    private Sound generatedSound;
+    [Range(0, 1)]
+    private float globalSound = .25f;
+    [SerializeField]
+    private Sound primarySound;
     [SerializeField]
     private Sound secondarySound;
-    [SerializeField]
-    private Sound placeHolder;
-    private AudioSource audioSource;
-
-    public List<float> samplesList = new List<float>();
     public GameObject squarePrefab;
 
     [Header("Piano Keys")]
@@ -92,36 +82,13 @@ public class ToneGenerator : MonoBehaviour
     [SerializeField]
     private Sound pianoSound;
 
+    [Header("Caching")]
+    [SerializeField]
+    private AudioSource audioSource;
+
     private void Start()
     {
         audioSource = this.GetComponent<AudioSource>();
-
-        generatedSound.audioClip = CreateToneAudioClip(generatedSound);
-        secondarySound.audioClip = CreateToneAudioClip(secondarySound);
-
-        ToneWaves.Instance.RefactorAudioClipWave(secondarySound);
-
-        placeHolder = ToneModifiers.Instance.InsertAudioClip(generatedSound, secondarySound, 2000);
-        //placeHolder.audioClip = ToneModifiers.Instance.ChangeVolume(placeHolder.audioClip, 0.5f);
-        //Sound[] combinedSettings = new Sound[2];
-        //combinedSettings[0] = generatedSound;
-        //combinedSettings[1] = secondarySound;
-
-        //Sound newSound = ToneModifiers.Instance.MultiplyAudioClips(combinedSettings);
-        //newSound.audioClip = ToneModifiers.Instance.ChangeVolume(newSound.audioClip, 0.1f);
-        //placeHolder = newSound;
-        //audioSource.PlayOneShot(newSound.audioClip);
-
-        //SpawnSampleSquare(newSound.Samples, 200);
-
-        //generatedSound.audioClip = CreateToneAudioClip(generatedSound);
-        //ToneWaves.Instance.RefactorAudioClipWave(generatedSound);
-
-        pianoSound.audioClip = GenerateAudioFromKey(pianoSound, pianoKeys);
-        pianoSound.audioClip = ToneModifiers.Instance.ChangeVolume(pianoSound.audioClip, 1f);
-
-        audioSource.PlayOneShot(pianoSound.audioClip);
-        
     }
 
     #region Generating Audioclip
@@ -148,7 +115,7 @@ public class ToneGenerator : MonoBehaviour
         soundSettings.sampleLength = Mathf.CeilToInt(soundSettings.sampleRate * soundSettings.sampleDurationSecs);
         float maxValue = 1f / 4f;
 
-        AudioClip audioClip = AudioClip.Create("new_tone", soundSettings.sampleLength, 1, soundSettings.sampleRate, false);
+        soundSettings.audioClip = AudioClip.Create("new_tone", soundSettings.sampleLength, 1, soundSettings.sampleRate, false);
 
         soundSettings.samples = new float[soundSettings.sampleLength];
         for (int i = 0; i < soundSettings.sampleLength; i++)
@@ -158,8 +125,9 @@ public class ToneGenerator : MonoBehaviour
             soundSettings.samples[i] = v;
         }
 
-        audioClip.SetData(soundSettings.samples, 0);
-        return audioClip;
+        soundSettings.audioClip.SetData(soundSettings.samples, 0);
+        ToneWaves.Instance.RefactorAudioClipWave(soundSettings);
+        return soundSettings.audioClip;
     }
 
     #endregion
@@ -187,7 +155,6 @@ public class ToneGenerator : MonoBehaviour
 
                 if (j == maxSampleLimit - 1 && maxSampleLimit <= soundSettings.sampleRate)
                 {
-                    print(startingPosition);
                     startingPosition = j;
                     maxSampleLimit += maxSampleIncrease;
                     i++;
@@ -236,14 +203,62 @@ public class ToneGenerator : MonoBehaviour
     }
     #endregion
 
-    #region Saving Sound
-    private void SaveAudioClip(AudioClip clip)
-    {
-        SaveWav.Save(Application.dataPath, clip);
-    }
-    #endregion
-
     #region Debug Functions
+
+    public void CombineAudioClips()
+    {
+        primarySound.audioClip = CreateToneAudioClip(primarySound);
+        secondarySound.audioClip = CreateToneAudioClip(secondarySound);
+
+        Sound[] combinedSettings = new Sound[2];
+        combinedSettings[0] = primarySound;
+        combinedSettings[1] = secondarySound;
+
+        Sound combinedSound = ToneModifiers.Instance.MultiplyAudioClips(combinedSettings);
+        combinedSound.audioClip = ToneModifiers.Instance.ChangeVolume(combinedSound.audioClip, globalSound);
+        audioSource.PlayOneShot(combinedSound.audioClip);
+        SaveWav.Save("combined_sound_clip", combinedSound.audioClip);
+    }
+
+    public void InsertAudioClips()
+    {
+        Sound insertedSound = ToneModifiers.Instance.InsertAudioClip(primarySound, secondarySound, primarySound.sampleLength);
+        insertedSound.audioClip = ToneModifiers.Instance.ChangeVolume(insertedSound.audioClip, globalSound);
+
+        audioSource.PlayOneShot(insertedSound.audioClip);
+        SaveWav.Save("inserted_audio_clip", insertedSound.audioClip);
+    }
+
+    public void PlayKeyboardKeys()
+    {
+        if (pianoKeys.Length > 0)
+        {
+            pianoSound.audioClip = GenerateAudioFromKey(pianoSound, pianoKeys);
+            pianoSound.audioClip = ToneModifiers.Instance.ChangeVolume(pianoSound.audioClip, globalSound);
+
+            audioSource.PlayOneShot(pianoSound.audioClip);
+            SaveWav.Save("piano_audio_clip", pianoSound.audioClip);
+        }    
+    }
+
+    public void PlayAudioClipOne()
+    {
+        primarySound.audioClip = CreateToneAudioClip(primarySound);
+
+        primarySound.audioClip = ToneModifiers.Instance.ChangeVolume(primarySound.audioClip, globalSound);
+        audioSource.PlayOneShot(primarySound.audioClip);
+        SaveWav.Save("primary_sound_clip", primarySound.audioClip);
+    }
+
+    public void PlayAudioClipTwo()
+    {
+        secondarySound.audioClip = CreateToneAudioClip(secondarySound);
+
+        secondarySound.audioClip = ToneModifiers.Instance.ChangeVolume(secondarySound.audioClip, globalSound);
+        audioSource.PlayOneShot(secondarySound.audioClip);
+        SaveWav.Save("secondary_sound_clip", primarySound.audioClip);
+    }
+
     /// <summary>
     /// Uses the samples from the audioclip to generate a visual intepretation of the wave using squares.
     /// </summary>
