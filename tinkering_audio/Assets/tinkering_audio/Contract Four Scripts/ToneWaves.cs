@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 //-----------------------------------------------------------------------
 // <copyright file="ToneWaves.cs">
@@ -12,6 +11,10 @@ using UnityEngine;
 // </summary>
 //----
 
+/// <summary>
+/// Holds all of the functions that return a value for the samples of an
+/// audioclip to provide a different and unique sound type
+/// </summary>
 public class ToneWaves : MonoBehaviour
 {
     #region Singleton Instance
@@ -162,6 +165,19 @@ public class ToneWaves : MonoBehaviour
     #endregion
 
     #region Perlin Noise Converter
+
+    /// <summary>
+    /// Converts an audioclip into a perlin noise based audio clip using Unity's
+    /// perlin noise function
+    /// </summary>
+    /// <param name="soundSettings"></param>
+    /// <remarks>
+    /// This function will provide a unique noise each time it is ran and is 
+    /// procedurally generated
+    /// </remarks>
+    /// <returns>
+    /// Returns an audioclip containing the new updated perlin noise audio
+    /// </returns>
     public AudioClip ConvertClipToPerlinNoise(Sound soundSettings)
     {
         float[] samples = new float[soundSettings.sampleLength];

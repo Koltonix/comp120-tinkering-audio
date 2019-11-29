@@ -1,9 +1,17 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
+/// <summary>
+/// In conjunction with the ToneGenerator variables this is used to create a 
+/// variety of buttons for a designer to create sounds quickly and effectively
+/// </summary>
 [CustomEditor(typeof(ToneGenerator))]
 public class ToneGeneratorEditor : Editor
 {
+    /// <summary>
+    /// Used to allow the user to invoke the function related to the respective
+    /// button which allows them to create sounds using the inspector only
+    /// </summary>
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();

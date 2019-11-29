@@ -168,6 +168,15 @@ public class ToneModifiers : MonoBehaviour
         return longestSound;
     }
 
+    /// <summary>
+    /// Adds all of the frequencies together to get the total combined using
+    /// an array of sounds
+    /// frequencies
+    /// </summary>
+    /// <param name="sounds"></param>
+    /// <returns>
+    /// Returns all of the frequencies added together
+    /// </returns>
     private float AddFrequencies(Sound[] sounds)
     {
         float frequency = 0;
@@ -179,6 +188,13 @@ public class ToneModifiers : MonoBehaviour
         return frequency;
     }
 
+    /// <summary>
+    /// Used to get the longest sample length out of an array of sounds
+    /// </summary>
+    /// <param name="sounds"></param>
+    /// <returns>
+    /// Returns the longest sample length
+    /// </returns>
     private float GetLongestSamplesLength(Sound[] sounds)
     {
         float longestSampleLength = 0;
@@ -197,6 +213,15 @@ public class ToneModifiers : MonoBehaviour
 
     #region Inserting Audio
 
+    /// <summary>
+    /// Inserts one audioclip into another using a given position as an integer
+    /// </summary>
+    /// <param name="originalSound"></param>
+    /// <param name="soundToInsert"></param>
+    /// <param name="insertingPosition"></param>
+    /// <returns>
+    /// Returns the audioclip with the new inserted sound inside
+    /// </returns>
     public Sound InsertAudioClip(Sound originalSound, Sound soundToInsert, int insertingPosition)
     {
         Sound[] sounds = { originalSound, soundToInsert };
@@ -212,9 +237,9 @@ public class ToneModifiers : MonoBehaviour
 
         newInsertedSound.audioClip = AudioClip.Create("inserted_tone", newInsertedSound.sampleLength, 1, newInsertedSound.sampleRate, false);
 
+        //Have to call this function since it is far easier to use a list in this situation rather than implementing it fully myself
         List<float> samples = ConvertFloatArrayToList(originalSound.samples);
         
-
         for (int i = 0; i < soundToInsert.samples.Length; i++)
         {
             samples.Insert(insertingPosition, soundToInsert.samples[i]);
@@ -226,6 +251,13 @@ public class ToneModifiers : MonoBehaviour
         return newInsertedSound;
     }
 
+    /// <summary>
+    /// Converts a regular float array to a float list
+    /// </summary>
+    /// <param name="samples"></param>
+    /// <returns>
+    /// Returns a list containing values of the float array
+    /// </returns>
     private List<float> ConvertFloatArrayToList(float[] samples)
     {
         List<float> list = new List<float>();

@@ -13,6 +13,10 @@ using UnityEngine;
 // </summary>
 //----
 
+/// <summary>
+/// Used to represent the different types of waves that the
+/// user can choose to use
+/// </summary>
 public enum WaveType
 {
     SINE = 0,
@@ -21,6 +25,11 @@ public enum WaveType
     DYNAMIC
 };
 
+
+/// <summary>
+/// Used to specify the Piano Key type for the player to use
+/// to create a piano sound clip
+/// </summary>
 public enum PianoKey
 {
     C4,
@@ -32,6 +41,9 @@ public enum PianoKey
     B4
 };
 
+/// <summary>
+/// Used to store the PianoKey enum and the respective frequency 
+/// </summary>
 [Serializable]
 public struct PianoNotes
 {
@@ -39,6 +51,10 @@ public struct PianoNotes
     public int frequency;
 }
 
+/// <summary>
+/// Stores all of the sound data that is related to the audioclip
+/// as well as the audioclip itself
+/// </summary>
 [Serializable]
 public class Sound
 {
@@ -53,6 +69,11 @@ public class Sound
     public int sampleLength;
 }
 
+/// <summary>
+/// Is the main script for dealing with the audio generation where it
+/// not only creates the audio clips, but also where you are able to 
+/// enter values through the inspector and test/debug it
+/// </summary>
 [RequireComponent(typeof(AudioSource))]
 public class ToneGenerator : MonoBehaviour
 {
@@ -133,7 +154,15 @@ public class ToneGenerator : MonoBehaviour
     #endregion
 
     #region Audio Key Generation
-
+    /// <summary>
+    /// Creates an audioclip based of off what the player has entered as their
+    /// piano keys and assigns it to the samples evenly across them all
+    /// </summary>
+    /// <param name="soundSettings"></param>
+    /// <param name="pianoKeys"></param>
+    /// <returns>
+    /// Returns an audioclip of the new piano sound set
+    /// </returns>
     public AudioClip GenerateAudioFromKey(Sound soundSettings, PianoKey[] pianoKeys)
     {
         soundSettings.audioClip = CreateToneAudioClip(soundSettings);
@@ -168,6 +197,13 @@ public class ToneGenerator : MonoBehaviour
         return soundSettings.audioClip;
     }
 
+    /// <summary>
+    /// Used to retreive the frequency of a given note using a simple search method
+    /// </summary>
+    /// <param name="pianoKey"></param>
+    /// <returns>
+    /// Returns the frequency of a note depending on the note supplied
+    /// </returns>
     private float GetNoteFrequency(PianoKey pianoKey)
     {
         foreach (PianoNotes key in pianoNotes)
@@ -205,6 +241,11 @@ public class ToneGenerator : MonoBehaviour
 
     #region Debug Functions
 
+    /// <summary>
+    /// Used for when the game is in the editor mode to ensure that the respective scripts
+    /// reference themselves in the singleton pattern otherwise it will cause a null
+    /// exception error
+    /// </summary>
     public void DebugInitialisaion()
     {
         ToneGenerator.Instance = this;
@@ -212,6 +253,9 @@ public class ToneGenerator : MonoBehaviour
         ToneWaves.Instance = FindObjectOfType<ToneWaves>();
     }
 
+    /// <summary>
+    /// Used on the editor button to combine the two clips
+    /// </summary>
     public void CombineAudioClips()
     {
         primarySound.audioClip = CreateToneAudioClip(primarySound);
@@ -227,6 +271,10 @@ public class ToneGenerator : MonoBehaviour
         SaveWav.Save("combined_sound_clip", combinedSound.audioClip);
     }
 
+    /// <summary>
+    /// Used on the editor button to insert the two clips and in this instance it inserts
+    /// it at the end of the first clip
+    /// </summary>
     public void InsertAudioClips()
     {
         Sound insertedSound = ToneModifiers.Instance.InsertAudioClip(primarySound, secondarySound, primarySound.sampleLength);
@@ -236,6 +284,9 @@ public class ToneGenerator : MonoBehaviour
         SaveWav.Save("inserted_audio_clip", insertedSound.audioClip);
     }
 
+    /// <summary>
+    /// Used on the editor button to play the keyboard notes that have been given in the array
+    /// </summary>
     public void PlayKeyboardKeys()
     {
         if (pianoKeys.Length > 0)
@@ -248,6 +299,9 @@ public class ToneGenerator : MonoBehaviour
         }    
     }
 
+    /// <summary>
+    /// Used on the editor button to play the first sound using the Sound data
+    /// </summary>
     public void PlayAudioClipOne()
     {
         primarySound.audioClip = CreateToneAudioClip(primarySound);
@@ -256,7 +310,9 @@ public class ToneGenerator : MonoBehaviour
         audioSource.PlayOneShot(primarySound.audioClip);
         SaveWav.Save("primary_sound_clip", primarySound.audioClip);
     }
-
+    /// <summary>
+    /// Used on the editor button to play the second sound using the Sound data
+    /// </summary>
     public void PlayAudioClipTwo()
     {
         secondarySound.audioClip = CreateToneAudioClip(secondarySound);
