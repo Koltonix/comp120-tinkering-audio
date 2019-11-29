@@ -9,7 +9,6 @@ using UnityEditor;
 // </copyright>
 // <author> Ludovico Bitti
 // <summary> generating the sound waves that increases it's frequency depending on car velocity
-// <this program takes care of 
 // </summary>
 //----
 

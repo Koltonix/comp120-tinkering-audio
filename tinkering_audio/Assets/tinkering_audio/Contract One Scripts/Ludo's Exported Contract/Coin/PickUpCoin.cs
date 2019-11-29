@@ -11,7 +11,6 @@ using UnityEditor;
 // <author> Ludovico Bitti
 // <author> Christopher Philip Robertson
 // <summary> in program i am generating the sound waves that will be playid once the coin is hit by the player
-// <this program takes care of 
 // </summary>
 //----
 
@@ -34,7 +33,6 @@ public class PickUpCoin : MonoBehaviour
         if (col.CompareTag("Player"))
         {
             audioSource.PlayOneShot(carAudioClip);
-            SaveWavFile(carAudioClip);
         }
     }
 
@@ -85,7 +83,7 @@ public class PickUpCoin : MonoBehaviour
     /// 
     /// </summary>
     /// <param name="frequency">frequency of the sound generated</param>
-    /// <param name="sampleRate">used to </param>
+    /// <param name="sampleRate"> how long the sound is plaid for </param>
     /// <param name="i"></param>
     /// <returns></returns>
     private float GenerateAudioFrame(int frequency, int sampleRate, int i)
@@ -93,8 +91,4 @@ public class PickUpCoin : MonoBehaviour
         return Mathf.Sin(2* Mathf.PI * frequency * ((float)i / (float)sampleRate) / (3f * Mathf.PI));
     }
 
-    public void SaveWavFile(AudioClip audioClip)
-    {
-        SaveWav.Save("C:\\Users\\Ludovico Bitti\\Desktop\\SoundCoin.wav", audioClip);
-    }
 } 
