@@ -34,7 +34,7 @@ of settings should be made available and configurable by a designer*
 - Sound needs to be saved
 - Sounds to be played on buttons
 
-## Instructions
+#### Instructions
 You are able to create sound using two methods. 
 
 The first is through the game engine when you play it, but here you are limited to creating one sound at a time using the sliders. The second method is to use the Tone Generator GameObject in the scene at either editor or runtime where you are able to fully customise two separate sounds. With these sounds you can insert and combine them here. Furthermore, you are also able to make use of the piano sound generator by entering a piano key in an array which then produces a sound based on the order. Every time you press these inspector buttons the file is automatically saved.
