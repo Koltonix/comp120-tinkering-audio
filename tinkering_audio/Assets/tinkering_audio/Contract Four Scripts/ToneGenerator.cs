@@ -205,6 +205,13 @@ public class ToneGenerator : MonoBehaviour
 
     #region Debug Functions
 
+    public void DebugInitialisaion()
+    {
+        ToneGenerator.Instance = this;
+        ToneModifiers.Instance = FindObjectOfType<ToneModifiers>();
+        ToneWaves.Instance = FindObjectOfType<ToneWaves>();
+    }
+
     public void CombineAudioClips()
     {
         primarySound.audioClip = CreateToneAudioClip(primarySound);
