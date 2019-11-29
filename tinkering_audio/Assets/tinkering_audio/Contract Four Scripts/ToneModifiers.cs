@@ -277,40 +277,4 @@ public class ToneModifiers : MonoBehaviour
     }
 
     #endregion
-
-    #region Pitch
-    /// <summary>
-    /// Increases the pitch of an audioclip where it uses a modifier
-    /// to duplicate each element a certain amount of times
-    /// </summary>
-    /// <param name="soundSettings"></param>
-    /// <param name="tempoModifier"></param>
-    /// <remarks>
-    /// This will only increase, decreasing will be a separate function.
-    /// Note that this will currently keep the maximum amount of samples
-    /// and will therefore remove any extras on the end that do not fit
-    /// </remarks>
-    public void DecreaseTempo(Sound soundSettings, int tempoModifier)
-    {
-        soundSettings.sampleLength = Mathf.CeilToInt(soundSettings.sampleRate * soundSettings.sampleDurationSecs) * tempoModifier;
-
-        List<float> alteredSamples = new List<float>();
-
-        soundSettings.audioClip = AudioClip.Create("primary_decreased_tempo", soundSettings.sampleLength, 1, soundSettings.sampleRate, false);
-
-        for (int i = 0; i < soundSettings.sampleLength; i++)
-        {
-            for (int j = 0; j < tempoModifier; j++)
-            {
-                if (i < soundSettings.samples.Length - 1)
-                {
-                    alteredSamples.Add(soundSettings.samples[i]);
-                }
-            }
-        }
-
-        soundSettings.samples = alteredSamples.ToArray();
-        ToneGenerator.Instance.RefactorSamplesInClip(soundSettings);
-    }
-    #endregion
 }

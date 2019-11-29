@@ -332,12 +332,11 @@ public class ToneGenerator : MonoBehaviour
         audioSource.PlayOneShot(secondarySound.audioClip);
         SaveWav.Save("secondary_sound_clip", primarySound.audioClip);
     }
-
-    public void HalfPrimaryPitch()
+    
+    public void CreatePrimaryEchoClip()
     {
         primarySound.audioClip = CreateToneAudioClip(primarySound);
 
-        ToneModifiers.Instance.DecreaseTempo(primarySound, 2);
         audioSource.PlayOneShot(primarySound.audioClip);
         SaveWav.Save("half_tempo_sound_clip", primarySound.audioClip);
     }
