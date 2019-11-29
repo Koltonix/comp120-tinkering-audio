@@ -13,6 +13,10 @@ using UnityEngine;
 // </summary>
 //----
 
+/// <summary>
+/// Used to represent the different types of waves that the
+/// user can choose to use
+/// </summary>
 public enum WaveType
 {
     SINE = 0,
@@ -21,6 +25,36 @@ public enum WaveType
     DYNAMIC
 };
 
+
+/// <summary>
+/// Used to specify the Piano Key type for the player to use
+/// to create a piano sound clip
+/// </summary>
+public enum PianoKey
+{
+    C4,
+    D4,
+    E4,
+    F4,
+    G4,
+    A4,
+    B4
+};
+
+/// <summary>
+/// Used to store the PianoKey enum and the respective frequency 
+/// </summary>
+[Serializable]
+public struct PianoNotes
+{
+    public PianoKey key;
+    public int frequency;
+}
+
+/// <summary>
+/// Stores all of the sound data that is related to the audioclip
+/// as well as the audioclip itself
+/// </summary>
 [Serializable]
 public class Sound
 {
@@ -28,13 +62,19 @@ public class Sound
     public float frequency;
     public WaveType waveType;
 
+    [HideInInspector]
     public float[] samples;
     public int sampleRate;
     public float sampleDurationSecs;
-    //[HideInInspector]
+    [HideInInspector]
     public int sampleLength;
 }
 
+/// <summary>
+/// Is the main script for dealing with the audio generation where it
+/// not only creates the audio clips, but also where you are able to 
+/// enter values through the inspector and test/debug it
+/// </summary>
 [RequireComponent(typeof(AudioSource))]
 public class ToneGenerator : MonoBehaviour
 {
@@ -46,45 +86,31 @@ public class ToneGenerator : MonoBehaviour
         else Destroy(this.gameObject);
     }
 
-    [Header("Wave Attributes")]
+    [Header("Debug Sound Data")]
     [SerializeField]
-    private Sound generatedSound;
+    [Range(0, 1)]
+    private float globalSound = .25f;
+    [SerializeField]
+    private Sound primarySound;
     [SerializeField]
     private Sound secondarySound;
-    [SerializeField]
-    private Sound placeHolder;
-    private AudioSource audioSource;
-
-    public List<float> samplesList = new List<float>();
     public GameObject squarePrefab;
+
+    [Header("Piano Keys")]
+    [SerializeField]
+    private PianoNotes[] pianoNotes;
+    [SerializeField]
+    private PianoKey[] pianoKeys;
+    [SerializeField]
+    private Sound pianoSound;
+
+    [Header("Caching")]
+    [SerializeField]
+    private AudioSource audioSource;
 
     private void Start()
     {
         audioSource = this.GetComponent<AudioSource>();
-
-        generatedSound.audioClip = CreateToneAudioClip(generatedSound);
-        secondarySound.audioClip = CreateToneAudioClip(secondarySound);
-
-        ToneWaves.Instance.RefactorAudioClipWave(secondarySound);
-
-        placeHolder = ToneModifiers.Instance.InsertAudioClip(generatedSound, secondarySound, 2000);
-        //placeHolder.audioClip = ToneModifiers.Instance.ChangeVolume(placeHolder.audioClip, 0.5f);
-        //Sound[] combinedSettings = new Sound[2];
-        //combinedSettings[0] = generatedSound;
-        //combinedSettings[1] = secondarySound;
-
-        //Sound newSound = ToneModifiers.Instance.MultiplyAudioClips(combinedSettings);
-        //newSound.audioClip = ToneModifiers.Instance.ChangeVolume(newSound.audioClip, 0.1f);
-        //placeHolder = newSound;
-        //audioSource.PlayOneShot(newSound.audioClip);
-
-        //SpawnSampleSquare(newSound.Samples, 200);
-
-        //generatedSound.audioClip = CreateToneAudioClip(generatedSound);
-        //ToneWaves.Instance.RefactorAudioClipWave(generatedSound);
-
-        //audioSource.PlayOneShot(placeHolder.audioClip);
-        
     }
 
     #region Generating Audioclip
@@ -111,8 +137,9 @@ public class ToneGenerator : MonoBehaviour
         soundSettings.sampleLength = Mathf.CeilToInt(soundSettings.sampleRate * soundSettings.sampleDurationSecs);
         float maxValue = 1f / 4f;
 
-        AudioClip audioClip = AudioClip.Create("new_tone", soundSettings.sampleLength, 1, soundSettings.sampleRate, false);
+        soundSettings.audioClip = AudioClip.Create("new_tone", soundSettings.sampleLength, 1, soundSettings.sampleRate, false);
 
+        //Generating and assigning the sine wave samples
         soundSettings.samples = new float[soundSettings.sampleLength];
         for (int i = 0; i < soundSettings.sampleLength; i++)
         {
@@ -121,10 +148,78 @@ public class ToneGenerator : MonoBehaviour
             soundSettings.samples[i] = v;
         }
 
-        audioClip.SetData(soundSettings.samples, 0);
-        return audioClip;
+        soundSettings.audioClip.SetData(soundSettings.samples, 0);
+        ToneWaves.Instance.RefactorAudioClipWave(soundSettings);
+        return soundSettings.audioClip;
     }
- 
+
+    #endregion
+
+    #region Audio Key Generation
+    /// <summary>
+    /// Creates an audioclip based of off what the player has entered as their
+    /// piano keys and assigns it to the samples evenly across them all
+    /// </summary>
+    /// <param name="soundSettings"></param>
+    /// <param name="pianoKeys"></param>
+    /// <returns>
+    /// Returns an audioclip of the new piano sound set
+    /// </returns>
+    public AudioClip GenerateAudioFromKey(Sound soundSettings, PianoKey[] pianoKeys)
+    {
+        soundSettings.audioClip = CreateToneAudioClip(soundSettings);
+        float maxValue = 1f / 4f;
+
+        //Used to determine how long each note gets in terms of sample length
+        int noteSampleLengthIncrease = Mathf.CeilToInt(soundSettings.samples.Length / pianoKeys.Length);
+        int maxNoteSamples = noteSampleLengthIncrease;
+        int startingPosition = 0;
+
+        for (int i = 0; i < pianoKeys.Length; i++)
+        {
+            for (int j = startingPosition; j < maxNoteSamples; j++)
+            {
+                //Sample length sanity check to avoid any errors
+                if (j >= soundSettings.samples.Length) break;
+
+                float s = ToneWaves.Instance.GetSinValue(GetNoteFrequency(pianoKeys[i]), j, soundSettings.sampleRate);
+                float v = s * maxValue;
+                soundSettings.samples[j] = v;
+
+                //When the note's sample length ends it goes onto the next note and will go to the next max length
+                if (j == maxNoteSamples - 1 && maxNoteSamples <= soundSettings.sampleRate)
+                {
+                    startingPosition = j;
+                    maxNoteSamples += noteSampleLengthIncrease;
+                    i++;
+                }
+            }         
+        }
+
+        soundSettings.audioClip.SetData(soundSettings.samples, 0);
+        return soundSettings.audioClip;
+    }
+
+    /// <summary>
+    /// Used to retreive the frequency of a given note using a simple search method
+    /// </summary>
+    /// <param name="pianoKey"></param>
+    /// <returns>
+    /// Returns the frequency of a note depending on the note supplied
+    /// </returns>
+    private float GetNoteFrequency(PianoKey pianoKey)
+    {
+        foreach (PianoNotes key in pianoNotes)
+        {
+            if (key.key == pianoKey)
+            {
+                return key.frequency;
+            }
+        }
+
+        throw new Exception("No key of that type exists");
+    }
+
     #endregion
 
     #region Refactor Samples
@@ -147,14 +242,105 @@ public class ToneGenerator : MonoBehaviour
     }
     #endregion
 
-    #region Saving Sound
-    private void SaveAudioClip(AudioClip clip)
-    {
-        SaveWav.Save(Application.dataPath, clip);
-    }
-    #endregion
-
     #region Debug Functions
+
+    /// <summary>
+    /// Used for when the game is in the editor mode to ensure that the respective scripts
+    /// reference themselves in the singleton pattern otherwise it will cause a null
+    /// exception error
+    /// </summary>
+    public void DebugInitialisaion()
+    {
+        Instance = this;
+        ToneModifiers.Instance = FindObjectOfType<ToneModifiers>();
+        ToneWaves.Instance = FindObjectOfType<ToneWaves>();
+    }
+
+    private void GenerateBothClips()
+    {
+        primarySound.audioClip = CreateToneAudioClip(primarySound);
+        secondarySound.audioClip = CreateToneAudioClip(secondarySound);
+    }
+
+    /// <summary>
+    /// Used on the editor button to combine the two clips
+    /// </summary>
+    public void CombineAudioClips()
+    {
+
+        GenerateBothClips();
+
+        Sound[] combinedSettings = new Sound[2];
+        combinedSettings[0] = primarySound;
+        combinedSettings[1] = secondarySound;
+
+        Sound combinedSound = ToneModifiers.Instance.MultiplyAudioClips(combinedSettings);
+        combinedSound.audioClip = ToneModifiers.Instance.ChangeVolume(combinedSound.audioClip, globalSound);
+        audioSource.PlayOneShot(combinedSound.audioClip);
+        SaveWav.Save("combined_sound_clip", combinedSound.audioClip);
+    }
+
+    /// <summary>
+    /// Used on the editor button to insert the two clips and in this instance it inserts
+    /// it at the end of the first clip
+    /// </summary>
+    public void InsertAudioClips()
+    {
+        GenerateBothClips();
+
+        Sound insertedSound = ToneModifiers.Instance.InsertAudioClip(primarySound, secondarySound, primarySound.sampleLength);
+        insertedSound.audioClip = ToneModifiers.Instance.ChangeVolume(insertedSound.audioClip, globalSound);
+
+        audioSource.PlayOneShot(insertedSound.audioClip);
+        SaveWav.Save("inserted_audio_clip", insertedSound.audioClip);
+    }
+
+    /// <summary>
+    /// Used on the editor button to play the keyboard notes that have been given in the array
+    /// </summary>
+    public void PlayKeyboardKeys()
+    {
+        if (pianoKeys.Length > 0)
+        {
+            pianoSound.audioClip = GenerateAudioFromKey(pianoSound, pianoKeys);
+            pianoSound.audioClip = ToneModifiers.Instance.ChangeVolume(pianoSound.audioClip, globalSound);
+
+            audioSource.PlayOneShot(pianoSound.audioClip);
+            SaveWav.Save("piano_audio_clip", pianoSound.audioClip);
+        }    
+    }
+
+    /// <summary>
+    /// Used on the editor button to play the first sound using the Sound data
+    /// </summary>
+    public void PlayAudioClipOne()
+    {
+        primarySound.audioClip = CreateToneAudioClip(primarySound);
+
+        primarySound.audioClip = ToneModifiers.Instance.ChangeVolume(primarySound.audioClip, globalSound);
+        audioSource.PlayOneShot(primarySound.audioClip);
+        SaveWav.Save("primary_sound_clip", primarySound.audioClip);
+    }
+    /// <summary>
+    /// Used on the editor button to play the second sound using the Sound data
+    /// </summary>
+    public void PlayAudioClipTwo()
+    {
+        secondarySound.audioClip = CreateToneAudioClip(secondarySound);
+
+        secondarySound.audioClip = ToneModifiers.Instance.ChangeVolume(secondarySound.audioClip, globalSound);
+        audioSource.PlayOneShot(secondarySound.audioClip);
+        SaveWav.Save("secondary_sound_clip", primarySound.audioClip);
+    }
+    
+    public void CreatePrimaryEchoClip()
+    {
+        primarySound.audioClip = CreateToneAudioClip(primarySound);
+
+        audioSource.PlayOneShot(primarySound.audioClip);
+        SaveWav.Save("half_tempo_sound_clip", primarySound.audioClip);
+    }
+
     /// <summary>
     /// Uses the samples from the audioclip to generate a visual intepretation of the wave using squares.
     /// </summary>

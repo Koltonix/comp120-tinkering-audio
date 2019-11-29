@@ -8,7 +8,7 @@ using UnityEngine;
 // <author>Christopher Philip Robertson</author>
 // <author>Ludovico Bitti</author>
 // <summary>
-// Handles the modificatino of the samples and sound clips to provide a new
+// Handles the modification of the samples and sound clips to provide a new
 // and unique sound.
 // </summary>
 //----
@@ -30,6 +30,10 @@ public class ToneModifiers : MonoBehaviour
     /// </summary>
     /// <param name="samples"></param>
     /// <param name="amplitude"></param>
+    /// <remarks>
+    /// Amplitude efers to the volume from a given decimal scale
+    /// </remarks>
+    /// 
     /// <returns>
     /// A list of floats that represent the samples in an AudioClip
     /// </returns>
@@ -87,15 +91,18 @@ public class ToneModifiers : MonoBehaviour
     public Sound MultiplyAudioClips(Sound[] sounds)
     {
         List<float> addedSamples = new List<float>();
+
         Sound combinedSettings = new Sound();
         combinedSettings.waveType = WaveType.DYNAMIC;
 
+        //Nested loop to iterate over all of the sounds
         for (int i = 0; i < sounds.Length; i++)
         {
             combinedSettings.frequency += sounds[i].frequency;
 
             for (int j = 0; j < sounds[i].samples.Length; j++)
             {
+                //If the array element is not initialised then add a new one
                 if (addedSamples.Count - 1 < j)
                 {
                     addedSamples.Add(sounds[i].samples[j]);
@@ -112,7 +119,7 @@ public class ToneModifiers : MonoBehaviour
         combinedSettings.samples = addedSamples.ToArray();
 
         combinedSettings.sampleLength = Mathf.RoundToInt(combinedSettings.samples.Length * combinedSettings.sampleDurationSecs);
-        combinedSettings.sampleRate = GetLargestSoundSampleRate(sounds);
+        combinedSettings.sampleRate = sounds[0].sampleRate;
 
         combinedSettings.audioClip = AudioClip.Create("multiplied_tone", combinedSettings.sampleLength, 1, combinedSettings.sampleRate, false);
 
@@ -168,6 +175,15 @@ public class ToneModifiers : MonoBehaviour
         return longestSound;
     }
 
+    /// <summary>
+    /// Adds all of the frequencies together to get the total combined using
+    /// an array of sounds
+    /// frequencies
+    /// </summary>
+    /// <param name="sounds"></param>
+    /// <returns>
+    /// Returns all of the frequencies added together
+    /// </returns>
     private float AddFrequencies(Sound[] sounds)
     {
         float frequency = 0;
@@ -179,6 +195,13 @@ public class ToneModifiers : MonoBehaviour
         return frequency;
     }
 
+    /// <summary>
+    /// Used to get the longest sample length out of an array of sounds
+    /// </summary>
+    /// <param name="sounds"></param>
+    /// <returns>
+    /// Returns the longest sample length
+    /// </returns>
     private float GetLongestSamplesLength(Sound[] sounds)
     {
         float longestSampleLength = 0;
@@ -197,6 +220,15 @@ public class ToneModifiers : MonoBehaviour
 
     #region Inserting Audio
 
+    /// <summary>
+    /// Inserts one audioclip into another using a given position as an integer
+    /// </summary>
+    /// <param name="originalSound"></param>
+    /// <param name="soundToInsert"></param>
+    /// <param name="insertingPosition"></param>
+    /// <returns>
+    /// Returns the audioclip with the new inserted sound inside
+    /// </returns>
     public Sound InsertAudioClip(Sound originalSound, Sound soundToInsert, int insertingPosition)
     {
         Sound[] sounds = { originalSound, soundToInsert };
@@ -207,19 +239,18 @@ public class ToneModifiers : MonoBehaviour
                                                         (soundToInsert.sampleDurationSecs * soundToInsert.sampleRate));
         newInsertedSound.samples = new float[newInsertedSound.sampleLength];
         newInsertedSound.frequency = AddFrequencies(sounds);
-        newInsertedSound.sampleRate = GetLargestSoundSampleRate(sounds);
+        newInsertedSound.sampleRate = originalSound.sampleRate;
         newInsertedSound.sampleDurationSecs = originalSound.sampleDurationSecs + soundToInsert.sampleDurationSecs;
 
         newInsertedSound.audioClip = AudioClip.Create("inserted_tone", newInsertedSound.sampleLength, 1, newInsertedSound.sampleRate, false);
 
+        //Have to call this function since it is far easier to use a list to insert in this situation rather than implementing it fully myself
         List<float> samples = ConvertFloatArrayToList(originalSound.samples);
         
-
         for (int i = 0; i < soundToInsert.samples.Length; i++)
         {
             samples.Insert(insertingPosition, soundToInsert.samples[i]);
         }
-        print(newInsertedSound.sampleLength);
 
         newInsertedSound.samples = samples.ToArray();
         newInsertedSound.audioClip.SetData(newInsertedSound.samples, 0);
@@ -227,6 +258,13 @@ public class ToneModifiers : MonoBehaviour
         return newInsertedSound;
     }
 
+    /// <summary>
+    /// Converts a regular float array to a float list
+    /// </summary>
+    /// <param name="samples"></param>
+    /// <returns>
+    /// Returns a list containing values of the float array
+    /// </returns>
     private List<float> ConvertFloatArrayToList(float[] samples)
     {
         List<float> list = new List<float>();
@@ -238,42 +276,5 @@ public class ToneModifiers : MonoBehaviour
         return list;
     }
 
-    #endregion
-
-    #region Pitch
-    /// <summary>
-    /// Increases the pitch of an audioclip where it uses a modifier
-    /// to duplicate each element a certain amount of times
-    /// </summary>
-    /// <param name="soundSettings"></param>
-    /// <param name="tempoModifier"></param>
-    /// <remarks>
-    /// This will only increase, decreasing will be a separate function.
-    /// Note that this will currently keep the maximum amount of samples
-    /// and will therefore remove any extras on the end that do not fit
-    /// </remarks>
-    public void IncreasePitch(Sound soundSettings, int tempoModifier)
-    {
-        float[] alteredSamples = new float[Mathf.FloorToInt(soundSettings.samples.Length * tempoModifier)];
-
-        int samplesIndex = 0;
-        int alteredSamplesIndex = 0;
-        while (samplesIndex < alteredSamples.Length - 1)
-        {
-            if (samplesIndex < soundSettings.samples.Length - 1)
-            {
-                alteredSamples[alteredSamplesIndex] = soundSettings.samples[samplesIndex];
-            }
-
-            if (alteredSamplesIndex % tempoModifier == 0)
-            {
-                samplesIndex++;
-            }
-
-            alteredSamplesIndex++;
-        }
-
-        soundSettings.samples = alteredSamples;
-    }
     #endregion
 }

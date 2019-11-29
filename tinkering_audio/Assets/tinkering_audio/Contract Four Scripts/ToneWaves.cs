@@ -11,11 +11,20 @@
 // </summary>
 //----
 
+/// <summary>
+/// Holds all of the functions that return a value for the samples of an
+/// audioclip to provide a different and unique sound type
+/// </summary>
 public class ToneWaves : MonoBehaviour
 {
-    [Header("Random Sound")]
-    [SerializeField]
-    private Sound randomSoundSettings;
+    #region Singleton Instance
+    public static ToneWaves Instance;
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(this.gameObject);
+    }
+    #endregion
 
     [Header("Perlin Noise")]
     [SerializeField]
@@ -26,15 +35,7 @@ public class ToneWaves : MonoBehaviour
     private float perlinNoiseScale = 20f;
     private Vector2 perlinNoiseOffset;
 
-    #region Singleton Instance
-    public static ToneWaves Instance;
-    private void Awake()
-    {
-        if (Instance == null) Instance = this;
-        else Destroy(this.gameObject);
-    }
-    #endregion
-
+    #region Audio Wave Refactorting
     /// <summary>
     /// Used in conjunction with the enums to refactor an audioclip automatically 
     /// with the new wave type rather than me manually assigning a function to each one
@@ -42,9 +43,7 @@ public class ToneWaves : MonoBehaviour
     /// <param name="soundSetting"></param>
     public void RefactorAudioClipWave(Sound soundSetting)
     {
-        if (soundSetting.waveType == WaveType.DYNAMIC) return;
-
-        if (soundSetting.waveType == WaveType.SINE)
+        if (soundSetting.waveType == WaveType.SQUARE)
         {
             soundSetting.audioClip = ConvertClipToSquareWave(soundSetting);
         }
@@ -54,6 +53,8 @@ public class ToneWaves : MonoBehaviour
             soundSetting.audioClip = ConvertClipToPerlinNoise(soundSetting);
         }
     }
+
+    #endregion
 
     #region Sine Wave
     /// <summary>
@@ -163,6 +164,19 @@ public class ToneWaves : MonoBehaviour
     #endregion
 
     #region Perlin Noise Converter
+
+    /// <summary>
+    /// Converts an audioclip into a perlin noise based audio clip using Unity's
+    /// perlin noise function
+    /// </summary>
+    /// <param name="soundSettings"></param>
+    /// <remarks>
+    /// This function will provide a unique noise each time it is ran and is 
+    /// procedurally generated
+    /// </remarks>
+    /// <returns>
+    /// Returns an audioclip containing the new updated perlin noise audio
+    /// </returns>
     public AudioClip ConvertClipToPerlinNoise(Sound soundSettings)
     {
         float[] samples = new float[soundSettings.sampleLength];
@@ -230,10 +244,5 @@ public class ToneWaves : MonoBehaviour
         return perlinSample;
     }
 
-    #endregion
-
-    #region Triangle Wave
-    //https://www.fxsolver.com/browse/formulas/Sawtooth+wave
-    //https://www.fxsolver.com/browse/formulas/Triangle+wave+%28in+trigonometric+terms%29
     #endregion
 }
