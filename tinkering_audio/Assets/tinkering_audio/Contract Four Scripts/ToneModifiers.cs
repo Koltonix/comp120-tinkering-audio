@@ -8,7 +8,7 @@ using UnityEngine;
 // <author>Christopher Philip Robertson</author>
 // <author>Ludovico Bitti</author>
 // <summary>
-// Handles the modificatino of the samples and sound clips to provide a new
+// Handles the modification of the samples and sound clips to provide a new
 // and unique sound.
 // </summary>
 //----
@@ -30,6 +30,10 @@ public class ToneModifiers : MonoBehaviour
     /// </summary>
     /// <param name="samples"></param>
     /// <param name="amplitude"></param>
+    /// <remarks>
+    /// Amplitude efers to the volume from a given decimal scale
+    /// </remarks>
+    /// 
     /// <returns>
     /// A list of floats that represent the samples in an AudioClip
     /// </returns>
@@ -87,15 +91,18 @@ public class ToneModifiers : MonoBehaviour
     public Sound MultiplyAudioClips(Sound[] sounds)
     {
         List<float> addedSamples = new List<float>();
+
         Sound combinedSettings = new Sound();
         combinedSettings.waveType = WaveType.DYNAMIC;
 
+        //Nested loop to iterate over all of the sounds
         for (int i = 0; i < sounds.Length; i++)
         {
             combinedSettings.frequency += sounds[i].frequency;
 
             for (int j = 0; j < sounds[i].samples.Length; j++)
             {
+                //If the array element is not initialised then add a new one
                 if (addedSamples.Count - 1 < j)
                 {
                     addedSamples.Add(sounds[i].samples[j]);
@@ -237,7 +244,7 @@ public class ToneModifiers : MonoBehaviour
 
         newInsertedSound.audioClip = AudioClip.Create("inserted_tone", newInsertedSound.sampleLength, 1, newInsertedSound.sampleRate, false);
 
-        //Have to call this function since it is far easier to use a list in this situation rather than implementing it fully myself
+        //Have to call this function since it is far easier to use a list to insert in this situation rather than implementing it fully myself
         List<float> samples = ConvertFloatArrayToList(originalSound.samples);
         
         for (int i = 0; i < soundToInsert.samples.Length; i++)
@@ -285,7 +292,7 @@ public class ToneModifiers : MonoBehaviour
     /// </remarks>
     public void IncreasePitch(Sound soundSettings, int tempoModifier)
     {
-        float[] alteredSamples = new float[Mathf.FloorToInt(soundSettings.samples.Length * tempoModifier)];
+        float[] alteredSamples = new float[Mathf.CeilToInt(soundSettings.samples.Length * tempoModifier)];
 
         int samplesIndex = 0;
         int alteredSamplesIndex = 0;

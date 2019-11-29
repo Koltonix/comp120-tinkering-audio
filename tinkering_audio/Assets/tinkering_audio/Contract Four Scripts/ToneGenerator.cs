@@ -138,6 +138,7 @@ public class ToneGenerator : MonoBehaviour
 
         soundSettings.audioClip = AudioClip.Create("new_tone", soundSettings.sampleLength, 1, soundSettings.sampleRate, false);
 
+        //Generating and assigning the sine wave samples
         soundSettings.samples = new float[soundSettings.sampleLength];
         for (int i = 0; i < soundSettings.sampleLength; i++)
         {
@@ -168,24 +169,27 @@ public class ToneGenerator : MonoBehaviour
         soundSettings.audioClip = CreateToneAudioClip(soundSettings);
         float maxValue = 1f / 4f;
 
-        int maxSampleIncrease = Mathf.CeilToInt(soundSettings.samples.Length / pianoKeys.Length);
-        int maxSampleLimit = maxSampleIncrease;
+        //Used to determine how long each note gets in terms of sample length
+        int noteSampleLengthIncrease = Mathf.CeilToInt(soundSettings.samples.Length / pianoKeys.Length);
+        int maxNoteSamples = noteSampleLengthIncrease;
         int startingPosition = 0;
 
         for (int i = 0; i < pianoKeys.Length; i++)
         {
-            for (int j = startingPosition; j < maxSampleLimit; j++)
+            for (int j = startingPosition; j < maxNoteSamples; j++)
             {
+                //Sample length sanity check to avoid any errors
                 if (j >= soundSettings.samples.Length) break;
 
                 float s = ToneWaves.Instance.GetSinValue(GetNoteFrequency(pianoKeys[i]), j, soundSettings.sampleRate);
                 float v = s * maxValue;
                 soundSettings.samples[j] = v;
 
-                if (j == maxSampleLimit - 1 && maxSampleLimit <= soundSettings.sampleRate)
+                //When the note's sample length ends it goes onto the next note and will go to the next max length
+                if (j == maxNoteSamples - 1 && maxNoteSamples <= soundSettings.sampleRate)
                 {
                     startingPosition = j;
-                    maxSampleLimit += maxSampleIncrease;
+                    maxNoteSamples += noteSampleLengthIncrease;
                     i++;
                 }
             }
@@ -248,7 +252,7 @@ public class ToneGenerator : MonoBehaviour
     /// </summary>
     public void DebugInitialisaion()
     {
-        ToneGenerator.Instance = this;
+        Instance = this;
         ToneModifiers.Instance = FindObjectOfType<ToneModifiers>();
         ToneWaves.Instance = FindObjectOfType<ToneWaves>();
     }

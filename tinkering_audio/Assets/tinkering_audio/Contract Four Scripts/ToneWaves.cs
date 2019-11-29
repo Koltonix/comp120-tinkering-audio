@@ -26,10 +26,6 @@ public class ToneWaves : MonoBehaviour
     }
     #endregion
 
-    [Header("Random Sound")]
-    [SerializeField]
-    private Sound randomSoundSettings;
-
     [Header("Perlin Noise")]
     [SerializeField]
     private int perlinNoiseHeight = 256;
@@ -39,6 +35,7 @@ public class ToneWaves : MonoBehaviour
     private float perlinNoiseScale = 20f;
     private Vector2 perlinNoiseOffset;
 
+    #region Audio Wave Refactorting
     /// <summary>
     /// Used in conjunction with the enums to refactor an audioclip automatically 
     /// with the new wave type rather than me manually assigning a function to each one
@@ -56,6 +53,8 @@ public class ToneWaves : MonoBehaviour
             soundSetting.audioClip = ConvertClipToPerlinNoise(soundSetting);
         }
     }
+
+    #endregion
 
     #region Sine Wave
     /// <summary>
