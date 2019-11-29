@@ -332,14 +332,6 @@ public class ToneGenerator : MonoBehaviour
         audioSource.PlayOneShot(secondarySound.audioClip);
         SaveWav.Save("secondary_sound_clip", primarySound.audioClip);
     }
-    
-    public void CreatePrimaryEchoClip()
-    {
-        primarySound.audioClip = CreateToneAudioClip(primarySound);
-
-        audioSource.PlayOneShot(primarySound.audioClip);
-        SaveWav.Save("half_tempo_sound_clip", primarySound.audioClip);
-    }
 
     /// <summary>
     /// Uses the samples from the audioclip to generate a visual intepretation of the wave using squares.

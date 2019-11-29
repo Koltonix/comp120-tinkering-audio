@@ -43,10 +43,5 @@ public class ToneGeneratorEditor : Editor
         {
             toneGenerator.PlayKeyboardKeys();
         }
-
-        if (GUILayout.Button("Primary Echo"))
-        {
-            toneGenerator.CreatePrimaryEchoClip();
-        }
     }
 }
